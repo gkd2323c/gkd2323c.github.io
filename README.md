@@ -1,1 +1,1 @@
-[[blog](https://blog.gkd2323c.in/)]()
+[blog](https://blog.gkd2323c.in/)
