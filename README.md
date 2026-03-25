@@ -1,1 +1,1 @@
-# gkd2323c.github.io
+[[blog](https://blog.gkd2323c.in/)]()
