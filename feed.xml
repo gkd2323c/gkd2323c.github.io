@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gridea Pro</title>
+    <link>https://www.gkd2323c.in/</link>
+    <description>Welcome to Gridea Pro</description>
+    <language>zh-cn</language>
+    <generator>Gridea Pro</generator>
+    <lastBuildDate>Wed, 25 Mar 2026 10:22:02 +0800</lastBuildDate>
+    <atom:link href="https://www.gkd2323c.in/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <item>
+      <title>Hello Gridea Pro</title>
+      <link>https://www.gkd2323c.in/post/hello-gridea/</link>
+      <guid isPermaLink="true">https://www.gkd2323c.in/post/hello-gridea/</guid>
+      <pubDate>Sun, 01 Feb 2026 12:00:00 +0800</pubDate>
+      <description><![CDATA[<p>👏  欢迎使用 <strong>Gridea Pro</strong> ！<br />
+✍️  <strong>Gridea Pro</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意&hellip; &hellip;</p>
+]]></description>
+      <category>Gridea</category>
+      <category>Gridea Pro</category>
+      <enclosure url="https://www.gkd2323c.in/post-images/hello-gridea.png" length="0" type="image/png"></enclosure>
+    </item>
+  </channel>
+</rss>
