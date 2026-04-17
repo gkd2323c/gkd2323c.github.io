@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Markdown 测试文件 | gkd2323c</title>
+	<link rel="stylesheet" href="/styles/main.css">
+	<style>
+		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+		.post-header { text-align: center; padding: 40px 0; }
+		.post-title { font-size: 2.5em; margin: 0; }
+		.post-meta { color: #999; margin-top: 10px; }
+		.post-content { margin-top: 40px; }
+		.post-content img { max-width: 100%; height: auto; }
+		.back-link { display: inline-block; margin-top: 40px; color: #0066cc; text-decoration: none; }
+	</style>
+</head>
+<body>
+	<article class="post">
+		<header class="post-header">
+			<h1 class="post-title">Markdown 测试文件</h1>
+			<div class="post-meta">2026-04-17</div>
+		</header>
+		<div class="post-content"><hr />
+<h2 id="tags-markdown---mermaid-admonition">title: Markdown 测试文件<br />
+author: gkd2323c<br />
+date: 2026-04-17<br />
+description: 包含标准 + 高级 Markdown 语法完整测试（含 GFM 扩展、Mermaid、Admonitions 等）<br />
+tags: [markdown, 测试, 高级语法, mermaid, admonition]</h2>
+<hr />
+<h1 id="markdown-">Markdown 测试文件</h1>
+<p><strong>文件名</strong>：<code>advanced-markdown-test.md</code><br />
+<strong>生成日期</strong>：2026年4月17日<br />
+<strong>用途</strong>：全面测试各种 Markdown 渲染器对<strong>标准语法 + 高级扩展</strong>的支持程度（GitHub、Obsidian、Typora、VS Code、Notion、Hexo、Hugo 等）。</p>
+<hr />
+<h2 id="1-">1. 基础语法测试（保留）</h2>
+<h3 id="11-h1--h6">1.1 标题（H1 ~ H6）</h3>
+<h1 id="h1-">H1 标题</h1>
+<h2 id="h2-">H2 标题</h2>
+<h3 id="h3-">H3 标题</h3>
+<h4 id="h4-">H4 标题</h4>
+<h5 id="h5-">H5 标题</h5>
+<h6 id="h6-">H6 标题</h6>
+<h3 id="12-">1.2 强调与格式</h3>
+<ul>
+<li><strong>粗体</strong> 和 <em>斜体</em></li>
+<li><del>删除线</del></li>
+<li>==高亮==</li>
+<li><code>行内代码</code></li>
+<li><strong><em>粗斜体</em></strong></li>
+<li><u>下划线</u></li>
+</ul>
+<h3 id="13-">1.3 段落与换行</h3>
+<p>第一段内容。</p>
+<p>第二段内容，使用两个空格<br />
+实现强制换行。</p>
+<hr />
+<h2 id="2-">2. 列表测试（保留）</h2>
+<h3 id="21-">2.1 无序列表</h3>
+<ul>
+<li>项目 1
+<ul>
+<li>子项目 1.1</li>
+</ul>
+</li>
+<li>项目 2</li>
+</ul>
+<h3 id="22-">2.2 有序列表</h3>
+<ol>
+<li>第一项</li>
+<li>第二项</li>
+</ol>
+<h3 id="23-">2.3 任务列表</h3>
+<ul>
+<li><input checked="" disabled="" type="checkbox" /> 已完成</li>
+<li><input disabled="" type="checkbox" /> 未完成</li>
+</ul>
+<hr />
+<h2 id="3-">3. 引用与代码（保留）</h2>
+<blockquote>
+<p>块引用</p>
+</blockquote>
+<pre><code class="language-python">def hello():
+    print(&quot;Hello Markdown!&quot;)
+</code></pre>
+<hr />
+<h2 id="4-">4. 表格测试（保留）</h2>
+<table>
+<thead>
+<tr>
+<th>姓名</th>
+<th>年龄</th>
+<th>职业</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>张三</td>
+<td>28</td>
+<td>工程师</td>
+</tr>
+<tr>
+<td>李四</td>
+<td>35</td>
+<td>设计师</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-">5. 链接与图片（保留）</h2>
+<p><a href="https://gkd2323c.in">外部链接</a><br />
+<img src="https://picsum.photos/800/400?random=42" alt="测试图片" title="随机测试图" /></p>
+<hr />
+<h2 id="6-">6. 分隔线与脚注（保留）</h2>
+<hr />
+<hr />
+<h2 id="7-html-">7. HTML 扩展测试（保留）</h2>
+<details>
+<summary>点击展开折叠内容</summary>
+这是一个可折叠区块。
+</details>
+<hr />
+<h2 id="8-">8. 数学公式测试（保留）</h2>
+<p>行内：$E=mc^2$<br />
+块级：<br />
+$$<br />
+\sum_{i=1}^{n} i = \frac{n(n+1)}{2}<br />
+$$</p>
+<hr />
+<h2 id="9--markdown-">9. 高级 Markdown 语法测试</h2>
+<h3 id="91-yaml-front-matter">9.1 YAML Front Matter（文件头部元数据）</h3>
+<p>（本文件顶部已实际使用）</p>
+<h3 id="92-emoji--unicode-">9.2 Emoji 与 Unicode 支持</h3>
+<p>:rocket: :fire: :100: :smile: :heart: :tada: :sparkles: :thumbsup:<br />
+支持 2000+ 个标准 Emoji，可直接使用。</p>
+<h3 id="93-definition-lists">9.3 定义列表（Definition Lists）</h3>
+<p>Markdown<br />
+: 轻量级标记语言，使用纯文本格式化。</p>
+<p>Grok<br />
+: xAI 构建的 AI 助手，旨在理解宇宙。</p>
+<p>Obsidian<br />
+: 支持高级 Markdown 扩展的笔记软件。</p>
+<h3 id="94-abbreviations">9.4 缩写（Abbreviations）</h3>
+<p>*[GFM]: GitHub Flavored Markdown<br />
+*[HTML]: HyperText Markup Language</p>
+<p>使用缩写后：GFM 是 GitHub 风格的 Markdown，基于 HTML 标准。</p>
+<h3 id="95-mermaid-">9.5 Mermaid 图表（流程图、时序图、甘特图等）</h3>
+<pre><code class="language-mermaid">flowchart TD
+    A[用户请求] --&gt; B[生成测试文件]
+    B --&gt; C[添加高级语法]
+    C --&gt; D[渲染成功]
+    style D fill:#90EE90
+</code></pre>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant 用户
+    participant Grok
+    用户-&gt;&gt;Grok: 添加更多高级语法
+    Grok--&gt;&gt;用户: 返回完整测试文件
+    Note right of Grok: 支持 Mermaid 扩展
+</code></pre>
+<pre><code class="language-mermaid">gantt
+    title 项目时间线
+    dateFormat YYYY-MM-DD
+    section 任务
+    编写基础语法 :done, 2026-04-17, 1d
+    添加高级语法 :active, 2026-04-17, 2d
+</code></pre>
+<h3 id="96-github--obsidian-admonitions--callouts">9.6 GitHub / Obsidian 风格提示框（Admonitions / Callouts）</h3>
+<blockquote>
+<p>[!NOTE]<br />
+这是一个<strong>笔记</strong>提示框，用于重要信息。</p>
+</blockquote>
+<blockquote>
+<p>[!TIP]<br />
+提示：Mermaid 和 Admonitions 在 GitHub、Obsidian、VS Code 中均原生支持。</p>
+</blockquote>
+<blockquote>
+<p>[!IMPORTANT]<br />
+重要：高级语法支持程度因渲染器而异。</p>
+</blockquote>
+<blockquote>
+<p>[!WARNING]<br />
+注意：部分老旧平台可能只显示普通引用。</p>
+</blockquote>
+<blockquote>
+<p>[!CAUTION]<br />
+警告：请勿在纯 Markdown 文件中使用过多扩展，以免兼容性问题。</p>
+</blockquote>
+<h3 id="97-html-">9.7 上标与下标（HTML 扩展）</h3>
+<p>化学式：H<sub>2</sub>O、CO<sub>2</sub><br />
+数学：x<sup>2</sup> + y<sup>2</sup> = z<sup>2</sup><br />
+第 10<sup>th</sup> 次测试</p>
+<h3 id="98-">9.8 高级代码块特性</h3>
+<p><strong>Diff 高亮：</strong></p>
+<pre><code class="language-diff">+ 新增高级 Markdown 支持
+- 移除对扩展语法的限制
+  普通代码行保持不变
+</code></pre>
+<p><strong>JSON + 注释：</strong></p>
+<pre><code class="language-json">{
+  &quot;advanced&quot;: true,
+  &quot;features&quot;: [&quot;mermaid&quot;, &quot;admonition&quot;, &quot;emoji&quot;, &quot;definition-list&quot;],
+  &quot;compatibility&quot;: &quot;high&quot;
+}
+</code></pre>
+<h3 id="99-">9.9 自动链接</h3>
+<p><a href="https://gkd2323c.in">https://gkd2323c.in</a><br />
+<a href="mailto:postmaster@gkd2323c.in">postmaster@gkd2323c.in</a><br />
+<a href="http://www.gkd2323c.in">www.gkd2323c.in</a> （部分渲染器会自动转换）</p>
+<hr />
+</div>
+	</article>
+	<a href="/" class="back-link">← 返回首页</a>
+	<footer style="text-align: center; padding: 40px 0; color: #999;">Powered by gkd2323c
+ <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script></footer>
+</body>
+</html>
