@@ -245,23 +245,22 @@
 
 
     <meta name="generator" content="Gridea Pro 1.2.2">
-    <title>别让 LLM 同时维护多个心智模型：Agent 工具设计原则 | gkd2323c</title>
+    <title>AI Agent | gkd2323c</title>
 
     
-<meta name="description" content="别让 LLM 同时维护多个心智模型：Agent 工具设计原则 引子 最近给 OpenHanako 提了 issue #1495。问题不复杂：Windows 平台下 bash 工具源码里写得很清楚，找不到 bash 就 fail fast，不降级 PowerShell——但商&amp;hellip;">
-<link rel="canonical" href="https://gkd2323c.in/post/llm-agent/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"别让 LLM 同时维护多个心智模型：Agent 工具设计原则","url":"https://gkd2323c.in/post/llm-agent/","description":"别让 LLM 同时维护多个心智模型：Agent 工具设计原则 引子 最近给 OpenHanako 提了 issue #1495。问题不复杂：Windows 平台下 bash 工具源码里写得很清楚，找不到 bash 就 fail fast，不降级 PowerShell——但商\u0026hellip;","datePublished":"2026-06-05T01:00:00+08:00","dateModified":"2026-06-05T02:09:00+08:00","author":{"@type":"Person","name":"gkd2323c"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"gkd2323c"}}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://gkd2323c.in","name":"gkd2323c","position":1},{"@type":"ListItem","item":"https://gkd2323c.in/post/llm-agent/","name":"别让 LLM 同时维护多个心智模型：Agent 工具设计原则","position":2}]}</script>
-<meta property="og:title" content="别让 LLM 同时维护多个心智模型：Agent 工具设计原则">
-<meta property="og:description" content="别让 LLM 同时维护多个心智模型：Agent 工具设计原则 引子 最近给 OpenHanako 提了 issue #1495。问题不复杂：Windows 平台下 bash 工具源码里写得很清楚，找不到 bash 就 fail fast，不降级 PowerShell——但商&amp;hellip;">
-<meta property="og:url" content="https://gkd2323c.in/post/llm-agent/">
-<meta property="og:type" content="article">
+<meta name="description" content="gkd2323c的博客">
+<link rel="canonical" href="https://gkd2323c.in/tag/ai-agent/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"gkd2323c","url":"https://gkd2323c.in","description":"gkd2323c的博客","potentialAction":{"@type":"SearchAction","query-input":"required name=search_term_string","target":"https://gkd2323c.in/search?q={search_term_string}"}}</script>
+<meta property="og:title" content="gkd2323c">
+<meta property="og:description" content="gkd2323c的博客">
+<meta property="og:url" content="https://gkd2323c.in/tag/ai-agent/">
+<meta property="og:type" content="website">
 <meta property="og:site_name" content="gkd2323c">
 <meta property="og:image" content="/images/avatar.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://gkd2323c.in/post/llm-agent/">
-<meta name="twitter:title" content="别让 LLM 同时维护多个心智模型：Agent 工具设计原则">
-<meta name="twitter:description" content="别让 LLM 同时维护多个心智模型：Agent 工具设计原则 引子 最近给 OpenHanako 提了 issue #1495。问题不复杂：Windows 平台下 bash 工具源码里写得很清楚，找不到 bash 就 fail fast，不降级 PowerShell——但商&amp;hellip;">
+<meta name="twitter:url" content="https://gkd2323c.in/tag/ai-agent/">
+<meta name="twitter:title" content="gkd2323c">
+<meta name="twitter:description" content="gkd2323c的博客">
 <meta name="twitter:image" content="/images/avatar.png">
 </head>
 
@@ -351,153 +350,38 @@
 </header>
 <!-- <a href="#" id="back-to-top" style="display: inline;"> ^ </a> -->
 
-<article class="mod-post mod-post__type-post">
-    <header>
-        <h1 class="mod-post__title">
-            别让 LLM 同时维护多个心智模型：Agent 工具设计原则
-        </h1>
+<section class="section-body">
+    <header class="section-header u-textAlignCenter">
+        <h2># AI Agent</h2>
     </header>
+    <article class="mod-archive">
 
-    <div class="mod-post__meta">
-        <time datetime="2026-06-05">
-            2026-06-05
-        </time> • 10 分钟阅读 •
-        
-        <a href="/tag/ai-agent/">
-            AI Agent
-        </a>
-         ·  
-        <a href="/tag/mcp/">
-            MCP
-        </a>
-         ·  
-        <a href="/tag/llm/">
-            LLM
-        </a>
-         ·  
-        <a href="/tag/she-ji-yuan-ze/">
-            设计原则
-        </a>
-         ·  
-        <a href="/tag/gong-cheng-shi-jian/">
-            工程实践
-        </a>
-          </div>
+        <div class="mod-archive__item">
+            <div class="mod-archive__year"></div>
 
+            </br>
 
-
-            <div class="mod-post__entry wzulli">
+            <ul class="mod-archive__list">
                 
-                <h1 id="-llm-agent-">别让 LLM 同时维护多个心智模型：Agent 工具设计原则</h1>
-<h2 id="heading">引子</h2>
-<p>最近给 OpenHanako 提了 <a href="https://github.com/liliMozi/openhanako/issues/1495">issue #1495</a>。问题不复杂：Windows 平台下 <code>bash</code> 工具源码里写得很清楚，找不到 bash 就 fail fast，不降级 PowerShell——但商业打包后实际跑的是 Windows PowerShell 5.1。</p>
-<p>为了验证，我跑了三条命令：</p>
-<pre><code class="language-powershell">$PSVersionTable.PSVersion.ToString()
-# → 5.1.20348.2849
-Get-Process | Select-Object -First 1 Name,Id
-# → 0store-service 4496
-echo $BASH_VERSION
-# → $BASH_VERSION   （字面量，没展开）
-</code></pre>
-<p><code>bash</code> 工具跑的不是 bash。这件事本身不意外，我之前就知道。但我盯着 <code>echo $BASH_VERSION</code> 那条返回多看了两秒，忽然意识到更深的问题：LLM 在 agent 里被反复要求同时维护多个心智模型（&ldquo;这个工具跑什么？什么语法？上次哪条错了？&quot;），而每个额外的心智模型都是隐性 prompt 成本加失败概率的提高。</p>
-<p>这篇文章是我对这个观察的系统化论述。先说清楚它不是什么，再说什么是它，最后承认我可能漏掉的几个地方。</p>
-<hr />
-<h2 id="heading-1">我看到的现象</h2>
-<p>我跑了半年 agent 调试，遇到过一类反复出现的失败模式：LLM 写命令时语法正确、工具选对、参数正确，但就是跑不通。事后看错误信息大多是 &ldquo;shell 不识别这个语法&rdquo; 或 &ldquo;这个命令找不到&rdquo;。重写一遍命令，换个语法就好了。</p>
-<p>学术上 <a href="https://arxiv.org/html/2512.07497v1">arXiv 2512.07497</a> 的 &ldquo;How Do LLMs Fail In Agentic Scenarios?&rdquo; 给这种失败起了个名字：<strong>tool-use fragility under cognitive load</strong>——LLM 不是不懂任务，是认知带宽被占满了。论文基于 900 个 agentic 执行 trace 的质性分析，识别出 4 种 failure archetype，这一类是其中之一。</p>
-<p><a href="https://gorilla.cs.berkeley.edu/blogs/8_berkeley_function_calling_leaderboard.html">Berkeley Function Calling Leaderboard</a> 的数据更直接：<strong>工具越多，准确率越低</strong>。但要注意——这组数据说的是工具<strong>数量</strong>与准确率的相关性，不一定是工具<strong>异质性</strong>的效应。10 个同构工具和 10 个异构工具，准确率下降曲线可能完全不同。我下面会用到这条数据，但<strong>只把它当作间接证据</strong>用，不当结论。</p>
-<p>我自己的工程直觉加上这些学术观察指向同一方向：<strong>让 LLM 看到的工具环境尽可能一致</strong>。具体什么意思我后面说，先聊一聊 MCP 在做什么。</p>
-<hr />
-<h2 id="mcp-">MCP 在做什么</h2>
-<p>2024 年 11 月，Anthropic 发布 Model Context Protocol，定位是&quot;USB-C for AI&rdquo;。到 2025 年中，<a href="https://arxiv.org/html/2505.02279v1">arXiv 2505.02279</a> 出了综述，把 MCP 跟 ACP、A2A、ANP 并列评估。</p>
-<p>MCP 解决的是接口碎片化。在它之前，每个 agent 框架（LangChain、CrewAI、AutoGen）有自己的 tool calling 规范，工具不能跨框架复用。MCP 把这部分统一了。Google Cloud、Oracle、Nebius 的工程 blog 评价都挺高。Anthropic 自己内部也用 MCP 替代 BigQuery CLI，说&quot;maintain better security control&quot;。</p>
-<p>但有意思的是 Anthropic 自己并不全走 MCP。Claude Code 有 8+ 个内置工具（Bash、Read、Edit、Grep、Glob、LS），全部 in-process 实现。Claude API 的 Bash、Text Editor、Computer Use 是 schema-less tool，schema 直接 build 到 model 里。只有用户/插件加的工具才走 MCP。</p>
-<p>这个取舍最常被解释成&quot;性能关键路径 in-process，扩展生态走 MCP&quot;——延迟敏感所以不绕 MCP server。这个解释对，但只是故事的一面。另一面是<strong>信任边界</strong>：in-process 工具跑在用户本地机器上，访问本地文件系统和 shell 权限；MCP 工具由第三方提供，运行在隔离的进程里。Anthropic 作为模型提供商和工具实现者的双重身份，让它能把&quot;哪些工具值得放到用户进程里&quot;和&quot;哪些应该隔离&quot;分得比较清楚。第三方平台没这个特权。</p>
-<p>我读 <a href="https://newsletter.pragmaticengineer.com/p/how-claude-code-is-built">Pragmatic Engineer 的 Claude Code 架构分析</a> 和 <a href="https://arxiv.org/html/2604.14228v1">arXiv 2604.14228</a> 的 Claude Code 源码 leak 分析时，这两层原因都浮现出来，但官方文档通常只讲第一层。</p>
-<hr />
-<h2 id="heading-2">一个真实案例</h2>
-<p><a href="https://github.com/liliMozi/openhanako/issues/1495">issue #1495</a> 完整故事如下。</p>
-<p>源码 <code>lib/sandbox/win32-exec.js</code> 写得很清楚：</p>
-<blockquote>
-<p>PowerShell 不在候选列表中：PI SDK 生成 bash 语法（&amp;&amp;、管道、command substitution 等），PowerShell 语法完全不兼容，静默降级只会让每条命令以莫名方式失败。如果所有 bash 兼容 shell 都不可用，应该 fail fast 并给出明确的安装指引。</p>
-</blockquote>
-<p>但商业打包的 <code>resources/server/bundle/index.js</code>（minified）实际跑的是 Windows PowerShell 5.1。源码设计的&quot;不降级 PowerShell&quot;被静默绕过了。</p>
-<p><strong>先承认一点</strong>：这个 bug 严格来说是<strong>构建完整性问题</strong>，不是设计哲学问题——minify 后的 bundle 没有正确执行源码的 fail-fast 逻辑。如果打包 pipeline 加了严格校验，#1495 根本不会出现。我用它作为引子是<strong>触发</strong>，不是<strong>证明</strong>。后面会讲到这条原则在哪些场景根本不适用。</p>
-<p>临时绕开方案倒是意外地干净——<code>mcp_windows-mcp_PowerShell</code> 工具是独立于 Hanako 平台的 MCP server，实测跑的是 PowerShell 7.6.2，不是被劫持的 PS 5.1。绕开被劫持的 bash 工具再 spawn 平台自带的 PortableGit，能拿到真 MINGW64 bash：</p>
-<pre><code class="language-powershell">&amp; 'C:\Program Files\Hanako\resources\git\bin\bash.exe' -c &quot;echo hello; uname -a&quot;
-# → MINGW64_NT-10.0-20348 ... Msys
-</code></pre>
-<p>讽刺的是这个绕开方案恰好就是「统一接口」原则的实践——MCP 工具的描述明确写&quot;PowerShell commands&quot;，LLM 一看就知道写什么语法，认知负担归零。</p>
-<hr />
-<h2 id="heading-3">一条原则</h2>
-<p>把上面的观察压成可操作的判断标准：</p>
-<blockquote>
-<p>「这会让 LLM 多维护一个心智模型吗？」是则反对。</p>
-</blockquote>
-<p>应用起来很直接。</p>
-<p>加一个新工具，描述清楚 runtime——LLM 心智模型没增加，通过。让一个工具支持多 shell runtime，配置项切换——LLM 每次调用要决定一个，否决。给 prompt 加 shell-specific 警告——本质上是在补救一个不该存在的问题，否决；应该去修问题本身而不是堆 prompt。</p>
-<p>这条原则的好处是可执行。架构上有争议时问这条，多数情况下答案就出来了。</p>
-<hr />
-<h2 id="heading-4">这条原则在哪不成立</h2>
-<p>写完回头看才发现，前面漏了几件事。补上：</p>
-<p><strong>第一，平台本身不是单态的时候。</strong> 「单态化」能成立的前提是平台本身就是单态的。一个同时支持 Windows、macOS、Linux 的平台，没法在 shell 层面做到真正的单态，除非它在所有 OS 上强制捆绑同一个 shell——而这本身就是另一种环境不一致（你把一个 Unix 兼容层塞进 Windows 里，那个 bash 能碰到的文件系统、环境变量、权限模型和 Linux 上的 bash 也不是同一个东西）。我之前没明说适用范围：<strong>这条原则主要适用于单 OS、单一部署场景的平台</strong>。跨平台部署需要别的设计。</p>
-<p><strong>第二，迁移过渡期。</strong> 从 bash 迁到 pwsh 的过程中，LLM 必然同时面对两种工具——旧工具还没退役，新工具还没覆盖全部功能。严格按这条原则，迁移根本无法启动。这条原则是稳态设计的判断标准，不是动态演进的指导原则。</p>
-<p><strong>第三，多 LLM provider 协作。</strong> 不同的 LLM 训练分布不同。Claude 可能对 bash 更友好（Anthropic 的 Unix 基因），Gemini 可能对 PowerShell 更友好（Microsoft-Google 合作生态）。如果强制单 shell 而那个 shell 恰好是某个 provider 的弱项，相当于在单态化的名义下主动降低了那个 provider 的工具调用质量。</p>
-<p><strong>第四，反方更彻底的方案是动态适配。</strong> autoconf 那一类工具的哲学是：构建时检测环境，运行时透明处理差异。LLM 不需要维护多个心智模型，因为平台在底层就把差异消化了。统一翻译是这条思路的 LLM 视角版本——我之前把它放在 fallback 而不是主路径，但客观讲这条思路可能比单态化更通用。代价是翻译层是新的 bug 源。</p>
-<p><strong>第五，#1495 证明的不是单态化本身。</strong> 它证明的是构建完整性校验的缺失。如果平台严格执行源码设计意图（fail fast 而不是降级），LLM 至少能拿到一个清晰的错误信息（&ldquo;no bash found&rdquo;），而不是被偷偷降级到 PowerShell。<strong>好的失败模式比坏的伪成功有用</strong>。</p>
-<p><strong>第六，&ldquo;心智模型&quot;这个说法本身可疑。</strong> LLM 没有工作记忆——它每次调工具时的上下文是一次性的 token 序列输入输出。它不会&quot;记得&quot;上次的错误是因为 shell 不匹配，除非那次错误信息被写回了 context window。我用&quot;心智模型&quot;是拟人化人类工程师的认知过程，可能不严格成立。换成更精确的说法：让 LLM 看到的<strong>工具行为预期保持一致</strong>，减少它需要&quot;在每次调用时重新做匹配&quot;的次数。意思接近，但少了拟人化的过度承诺。</p>
-<hr />
-<h2 id="heading-5">接下来</h2>
-<p>我打算把这条原则应用到我自己的两个项目里。一个是 Hanako 平台的 plugin 工具集，按&quot;工具描述明确 runtime + 平台核心工具 in-process 但行为可预测&quot;过一遍。另一个是 Skyrim 模组管理工具——虽然和 agent 没关系，但里面调用 subprocess 的部分同样适用（mod 安装脚本在不同 shell 下行为不同，强迫用户记两种语法是浪费）。</p>
-<p>如果这条原则对你也有用，欢迎讨论。具体的反例、边界情况、或者你踩过的别的&quot;心智模型爆炸&quot;案例，都可以发到 <a href="https://github.com/liliMozi/openhanako/issues/1495">issue #1495</a> 下面一起看。我前面列的 5 个不成立场景大概率不完整，欢迎补全。</p>
-<p><strong>参考资源</strong>：</p>
-<ul>
-<li><a href="https://github.com/liliMozi/openhanako/issues/1495">OpenHanako issue #1495 - 商业打包绕过 win32-exec 设计</a></li>
-<li><a href="https://github.com/liliMozi/openhanako/issues/1335">OpenHanako issue #1335 - shell backend configurable</a></li>
-<li><a href="https://github.com/liliMozi/openhanako/issues/1337">OpenHanako issue #1337 - bash 工具 Windows 路由设计</a></li>
-<li><a href="https://www.anthropic.com/news/model-context-protocol">Anthropic - Model Context Protocol</a></li>
-<li><a href="https://www.anthropic.com/engineering/writing-tools-for-agents">Anthropic - Writing effective tools for AI agents</a></li>
-<li><a href="https://arxiv.org/html/2505.02279v1">arXiv 2505.02279 - A Survey of Agent Interoperability Protocols</a></li>
-<li><a href="https://arxiv.org/html/2512.07497v1">arXiv 2512.07497 - How Do LLMs Fail In Agentic Scenarios?</a></li>
-<li><a href="https://arxiv.org/html/2604.14228v1">arXiv 2604.14228 - Dive into Claude Code Architecture</a></li>
-<li><a href="https://arxiv.org/html/2605.24309v1">arXiv 2605.24309 - Reframing LLM Agent Security as Agent-Human Interaction</a></li>
-<li><a href="https://newsletter.pragmaticengineer.com/p/how-claude-code-is-built">Pragmatic Engineer - How Claude Code is built</a></li>
-<li><a href="https://www.scalekit.com/blog/unified-tool-calling-architecture-langchain-crewai-mcp">Scalekit - Unified tool calling architecture</a></li>
-<li><a href="https://gorilla.cs.berkeley.edu/blogs/8_berkeley_function_calling_leaderboard.html">Berkeley Function Calling Leaderboard</a></li>
-</ul>
+                <li>
+                    <time class="mod-archive__time" datetime="2026-06-05">2026-06-05</time>
+                    <span>&nbsp;&nbsp;&nbsp;</span>
+                    <a href="/post/llm-agent/">别让 LLM 同时维护多个心智模型：Agent 工具设计原则</a>
+                </li>
+                
 
+            </ul>
+
+            <div class="posts-nav">
+                
+
+                
             </div>
 
-</article>
+        </div>
+    </article>
+</section>
 
-
-
-
-
-
-<div class="mod-post__poster">
-</div>
-
-</div>
-
-
-
-
-
-
-
-
-<!-- Reading Progress Component -->
-<div class="reading-progress-container">
-  <span class="reading-label">阅读进度</span>
-  <span class="reading-value">0%</span>
-  <svg class="progress-ring" viewBox="0 0 24 24">
-    <!-- Background Circle -->
-    <circle class="progress-ring__circle-bg" stroke-width="3" fill="transparent" r="10" cx="12" cy="12" />
-    <!-- Progress Circle -->
-    <circle class="progress-ring__circle" stroke-width="3" fill="transparent" r="10" cx="12" cy="12" />
-  </svg>
-</div>
 <footer id="footer" class="footer">
     <nav>
         
@@ -532,8 +416,6 @@ echo $BASH_VERSION
         </a>
     </div>
 </footer>
-
-
 
 
     
