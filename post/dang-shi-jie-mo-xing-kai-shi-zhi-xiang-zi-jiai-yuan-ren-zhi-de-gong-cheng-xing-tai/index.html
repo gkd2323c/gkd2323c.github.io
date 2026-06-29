@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+<meta name="viewport"
+    content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, width=device-width" />
+<meta name="renderer" content="webkit">
+<meta name="format-detection" content="telephone=no, email=no, address=no">
+
+
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#292a2d" media="(prefers-color-scheme: dark)">
+
+
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/gkd2323c/blog_cdn@main/images/theme/appicon.png">
+<link rel="stylesheet" href="/styles/main.min.css">
+
+
+<style>:root{--accent-color:#28df99;}</style>
+
+
+<script>
+    // 自动为所有 target="_blank" 的链接添加 rel="noopener noreferrer"
+    document.addEventListener('DOMContentLoaded', function () {
+        var links = document.querySelectorAll('a[target="_blank"]');
+        links.forEach(function (link) {
+            var rel = link.getAttribute('rel') || '';
+            if (rel.indexOf('noopener') === -1) {
+                rel += ' noopener';
+            }
+            if (rel.indexOf('noreferrer') === -1) {
+                rel += ' noreferrer';
+            }
+            link.setAttribute('rel', rel.trim());
+        });
+    });
+</script>
+
+<script>
+    // declaraction of document.ready() function.
+    (function () {
+        var ie = !!(window.attachEvent && !window.opera);
+        var wk = /webkit\/(\d+)/i.test(navigator.userAgent) && (RegExp.$1 < 525);
+        var fn = [];
+        var run = function () {
+            for (var i = 0; i < fn.length; i++) fn[i]();
+        };
+        var d = document;
+        d.ready = function (f) {
+            if (!ie && !wk && d.addEventListener)
+                return d.addEventListener('DOMContentLoaded', f, false);
+            if (fn.push(f) > 1) return;
+            if (ie)
+                (function () {
+                    try {
+                        d.documentElement.doScroll('left');
+                        run();
+                    } catch (err) {
+                        setTimeout(arguments.callee, 0);
+                    }
+                })();
+            else if (wk)
+                var t = setInterval(function () {
+                    if (/^(loaded|complete)$/.test(d.readyState))
+                        clearInterval(t), run();
+                }, 0);
+        };
+    })();
+
+
+    document.ready(
+        function () {
+            var _Blog = window._Blog || {};
+
+            const getSystemTheme = () => {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    return 'dark';
+                }
+                return 'light';
+            };
+
+            const configDefault = 'dark';
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme');
+            const initialTheme = currentTheme || configDefault || getSystemTheme();
+            const isDark = initialTheme === 'dark';
+
+            const updateButtons = (dark) => {
+                const sunBtn = document.getElementById("theme-toggle-sun");
+                const moonBtn = document.getElementById("theme-toggle-moon");
+                const mobileSunBtn = document.getElementById("mobile-theme-toggle-sun");
+                const mobileMoonBtn = document.getElementById("mobile-theme-toggle-moon");
+
+                if (dark) {
+                    if (sunBtn) sunBtn.style.display = 'none';
+                    if (moonBtn) moonBtn.style.display = 'inline-block';
+                    if (mobileSunBtn) mobileSunBtn.style.display = 'none';
+                    if (mobileMoonBtn) mobileMoonBtn.style.display = 'inline-block';
+                } else {
+                    if (sunBtn) sunBtn.style.display = 'inline-block';
+                    if (moonBtn) moonBtn.style.display = 'none';
+                    if (mobileSunBtn) mobileSunBtn.style.display = 'inline-block';
+                    if (mobileMoonBtn) mobileMoonBtn.style.display = 'none';
+                }
+            };
+
+            const updateThemeColor = (dark) => {
+                const themeColor = dark ? '#292a2d' : '#ffffff';
+                const metaTags = document.querySelectorAll('meta[name="theme-color"]');
+                if (metaTags.length > 0) {
+                    // 保留第一个，移除其他的，避免重复
+                    for (let i = 1; i < metaTags.length; i++) {
+                        metaTags[i].remove();
+                    }
+                    metaTags[0].setAttribute('content', themeColor);
+                    metaTags[0].removeAttribute('media');
+                } else {
+                    const meta = document.createElement('meta');
+                    meta.name = 'theme-color';
+                    meta.content = themeColor;
+                    document.head.appendChild(meta);
+                }
+            };
+
+            const applyTheme = (dark) => {
+                const body = document.getElementsByTagName('body')[0];
+                if (dark) {
+                    body.classList.add('dark-theme');
+                } else {
+                    body.classList.remove('dark-theme');
+                }
+                updateButtons(dark);
+                updateThemeColor(dark);
+            };
+
+            // Initial application
+            applyTheme(isDark);
+            if (!currentTheme) {
+                window.localStorage && window.localStorage.setItem('theme', initialTheme);
+            }
+
+            _Blog.toggleTheme = function () {
+                const toggleFunc = (e) => {
+                    // Prevent bubbling if needed, though buttons are distinct now
+                    if (e) e.stopPropagation();
+
+                    const body = document.getElementsByTagName('body')[0];
+                    const isCurrentlyDark = body.classList.contains('dark-theme');
+
+                    if (isCurrentlyDark) {
+                        body.classList.remove('dark-theme');
+                        updateButtons(false);
+                        window.localStorage && window.localStorage.setItem('theme', 'light');
+                    } else {
+                        body.classList.add('dark-theme');
+                        updateButtons(true);
+                        window.localStorage && window.localStorage.setItem('theme', 'dark');
+                    }
+                };
+
+                const sunBtn = document.getElementById("theme-toggle-sun");
+                const moonBtn = document.getElementById("theme-toggle-moon");
+                const mobileSunBtn = document.getElementById("mobile-theme-toggle-sun");
+                const mobileMoonBtn = document.getElementById("mobile-theme-toggle-moon");
+
+                if (sunBtn) sunBtn.addEventListener('click', toggleFunc);
+                if (moonBtn) moonBtn.addEventListener('click', toggleFunc);
+                if (mobileSunBtn) mobileSunBtn.addEventListener('click', toggleFunc);
+                if (mobileMoonBtn) mobileMoonBtn.addEventListener('click', toggleFunc);
+            };
+            _Blog.toggleTheme();
+
+            if (window.matchMedia && !configDefault) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                    const newTheme = e.matches ? 'dark' : 'light';
+                    applyTheme(e.matches);
+                    window.localStorage && window.localStorage.setItem('theme', newTheme);
+                });
+            }
+        }
+    );
+</script>
+
+<script>
+    // Reading Progress Component
+    document.addEventListener('DOMContentLoaded', () => {
+        const progressValue = document.querySelector('.reading-value');
+        const progressCircle = document.querySelector('.progress-ring__circle');
+        const container = document.querySelector('.reading-progress-container');
+
+        // Exit if elements don't exist (e.g., not on a post page)
+        if (!progressValue || !progressCircle || !container) {
+            return;
+        }
+
+        // SVG Circle setup
+        const radius = progressCircle.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
+
+        progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+        progressCircle.style.strokeDashoffset = circumference;
+
+        function setProgress(percent) {
+            const safePercent = Math.min(100, Math.max(0, percent));
+            progressValue.textContent = `${Math.round(safePercent)}%`;
+            const offset = circumference - (safePercent / 100) * circumference;
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        function onScroll() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+
+            if (scrollHeight <= 0) {
+                setProgress(0);
+                return;
+            }
+
+            const scrollPercent = (scrollTop / scrollHeight) * 100;
+            setProgress(scrollPercent);
+
+            // Show/Hide logic: Show if scrolled more than 100px
+            if (scrollTop > 100) {
+                container.classList.add('show');
+            } else {
+                container.classList.remove('show');
+            }
+        }
+
+        // Initialize
+        onScroll();
+
+        // Listen for scroll events
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // Recalculate on resize
+        window.addEventListener('resize', onScroll);
+    });
+</script>
+
+
+
+
+
+
+
+    <meta name="generator" content="Gridea Pro 1.2.2">
+    <title>当世界模型开始指向自己：AI 元认知的工程形态 | gkd2323c</title>
+
+    
+<meta name="description" content="一、一张截图暴露的归因失败 故事的起点很轻。一张《艾尔登法环》的截图：站在悬崖边，俯瞰石拱废墟和瀑布，问&amp;quot;下面要怎么去&amp;quot;。 AI 给出了几个似是而非的猜测。看起来在帮忙，实际上是在掩盖。它的视觉-空间理解能力根本到不了那里。 那一刻它把模型缺陷归因到了任务难度上，归因不到自己的盲区。一次失败的归因校准，也是后面整个讨论的起点。 二、为什么 AI 在游戏攻略上不行&amp;hellip;">
+<link rel="canonical" href="https://gkd2323c.in/post/dang-shi-jie-mo-xing-kai-shi-zhi-xiang-zi-jiai-yuan-ren-zhi-de-gong-cheng-xing-tai/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"当世界模型开始指向自己：AI 元认知的工程形态","url":"https://gkd2323c.in/post/dang-shi-jie-mo-xing-kai-shi-zhi-xiang-zi-jiai-yuan-ren-zhi-de-gong-cheng-xing-tai/","description":"一、一张截图暴露的归因失败 故事的起点很轻。一张《艾尔登法环》的截图：站在悬崖边，俯瞰石拱废墟和瀑布，问\u0026quot;下面要怎么去\u0026quot;。 AI 给出了几个似是而非的猜测。看起来在帮忙，实际上是在掩盖。它的视觉-空间理解能力根本到不了那里。 那一刻它把模型缺陷归因到了任务难度上，归因不到自己的盲区。一次失败的归因校准，也是后面整个讨论的起点。 二、为什么 AI 在游戏攻略上不行\u0026hellip;","datePublished":"2026-06-30T07:58:43+08:00","dateModified":"2026-06-30T00:02:14+08:00","author":{"@type":"Person","name":"gkd2323c"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"gkd2323c"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://gkd2323c.in","name":"gkd2323c","position":1},{"@type":"ListItem","item":"https://gkd2323c.in/post/dang-shi-jie-mo-xing-kai-shi-zhi-xiang-zi-jiai-yuan-ren-zhi-de-gong-cheng-xing-tai/","name":"当世界模型开始指向自己：AI 元认知的工程形态","position":2}]}</script>
+<meta property="og:title" content="当世界模型开始指向自己：AI 元认知的工程形态">
+<meta property="og:description" content="一、一张截图暴露的归因失败 故事的起点很轻。一张《艾尔登法环》的截图：站在悬崖边，俯瞰石拱废墟和瀑布，问&amp;quot;下面要怎么去&amp;quot;。 AI 给出了几个似是而非的猜测。看起来在帮忙，实际上是在掩盖。它的视觉-空间理解能力根本到不了那里。 那一刻它把模型缺陷归因到了任务难度上，归因不到自己的盲区。一次失败的归因校准，也是后面整个讨论的起点。 二、为什么 AI 在游戏攻略上不行&amp;hellip;">
+<meta property="og:url" content="https://gkd2323c.in/post/dang-shi-jie-mo-xing-kai-shi-zhi-xiang-zi-jiai-yuan-ren-zhi-de-gong-cheng-xing-tai/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="gkd2323c">
+<meta property="og:image" content="/images/avatar.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://gkd2323c.in/post/dang-shi-jie-mo-xing-kai-shi-zhi-xiang-zi-jiai-yuan-ren-zhi-de-gong-cheng-xing-tai/">
+<meta name="twitter:title" content="当世界模型开始指向自己：AI 元认知的工程形态">
+<meta name="twitter:description" content="一、一张截图暴露的归因失败 故事的起点很轻。一张《艾尔登法环》的截图：站在悬崖边，俯瞰石拱废墟和瀑布，问&amp;quot;下面要怎么去&amp;quot;。 AI 给出了几个似是而非的猜测。看起来在帮忙，实际上是在掩盖。它的视觉-空间理解能力根本到不了那里。 那一刻它把模型缺陷归因到了任务难度上，归因不到自己的盲区。一次失败的归因校准，也是后面整个讨论的起点。 二、为什么 AI 在游戏攻略上不行&amp;hellip;">
+<meta name="twitter:image" content="/images/avatar.png">
+</head>
+
+<body class="">
+
+    
+<script>
+    (function () {
+        const getSystemTheme = () => {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                return 'dark';
+            }
+            return 'light';
+        };
+
+        const configDefault = 'dark';
+        const savedTheme = localStorage.getItem('theme');
+        const theme = savedTheme || configDefault || getSystemTheme();
+
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+
+        if (!savedTheme) {
+            localStorage.setItem('theme', theme);
+        }
+    })();
+</script>
+<header class="mod-head">
+    <div class="mod-head__left">
+        <div class="mod-head__logo">
+            <a href="/">
+                
+                <img class="avatar" alt="avatar" src="https://cdn.jsdelivr.net/gh/gkd2323c/blog_cdn@main/images/theme/appicon.png">
+                
+            </a>
+        </div>
+    </div>
+
+    <div class="mod-head__right">
+        <span>
+            <button id="theme-toggle-sun" class="tiptap-button theme-toggle-sun" aria-label="Switch to dark mode">
+                <svg width="18" height="18" class="tiptap-button-icon" viewBox="0 0 24 24" fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 1C12.5523 1 13 1.44772 13 2V4C13 4.55228 12.5523 5 12 5C11.4477 5 11 4.55228 11 4V2C11 1.44772 11.4477 1 12 1Z"
+                        fill="currentColor"></path>
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M13 20C13 19.4477 12.5523 19 12 19C11.4477 19 11 19.4477 11 20V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V20Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M4.22282 4.22289C4.61335 3.83236 5.24651 3.83236 5.63704 4.22289L7.04704 5.63289C7.43756 6.02341 7.43756 6.65658 7.04704 7.0471C6.65651 7.43762 6.02335 7.43762 5.63283 7.0471L4.22282 5.6371C3.8323 5.24658 3.8323 4.61341 4.22282 4.22289Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M18.367 16.9529C17.9765 16.5623 17.3433 16.5623 16.9528 16.9529C16.5623 17.3434 16.5623 17.9766 16.9528 18.3671L18.3628 19.7771C18.7533 20.1676 19.3865 20.1676 19.777 19.7771C20.1675 19.3866 20.1675 18.7534 19.777 18.3629L18.367 16.9529Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M1 12C1 11.4477 1.44772 11 2 11H4C4.55228 11 5 11.4477 5 12C5 12.5523 4.55228 13 4 13H2C1.44772 13 1 12.5523 1 12Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M20 11C19.4477 11 19 11.4477 19 12C19 12.5523 19.4477 13 20 13H22C22.5523 13 23 12.5523 23 12C23 11.4477 22.5523 11 22 11H20Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M7.04704 16.9529C7.43756 17.3434 7.43756 17.9766 7.04704 18.3671L5.63704 19.7771C5.24651 20.1676 4.61335 20.1676 4.22282 19.7771C3.8323 19.3866 3.8323 18.7534 4.22283 18.3629L5.63283 16.9529C6.02335 16.5623 6.65651 16.5623 7.04704 16.9529Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M19.777 5.6371C20.1675 5.24657 20.1675 4.61341 19.777 4.22289C19.3865 3.83236 18.7533 3.83236 18.3628 4.22289L16.9528 5.63289C16.5623 6.02341 16.5623 6.65658 16.9528 7.0471C17.3433 7.43762 17.9765 7.43762 18.367 7.0471L19.777 5.6371Z"
+                        fill="currentColor"></path>
+                </svg>
+            </button>
+            <button id="theme-toggle-moon" class="tiptap-button theme-toggle-moon" aria-label="Switch to light mode">
+                <svg width="18" height="18" class="tiptap-button-icon" viewBox="0 0 24 24" fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 11.5955 21.7564 11.2309 21.3827 11.0761C21.009 10.9213 20.5789 11.0069 20.2929 11.2929C19.287 12.2988 17.9226 12.864 16.5 12.864C15.0774 12.864 13.713 12.2988 12.7071 11.2929C11.7012 10.287 11.136 8.92261 11.136 7.5C11.136 6.07739 11.7012 4.71304 12.7071 3.70711C12.9931 3.42111 13.0787 2.99099 12.9239 2.61732C12.7691 2.24364 12.4045 2 12 2ZM7.55544 5.34824C8.27036 4.87055 9.05353 4.51389 9.87357 4.28778C9.39271 5.27979 9.13604 6.37666 9.13604 7.5C9.13604 9.45304 9.91189 11.3261 11.2929 12.7071C12.6739 14.0881 14.547 14.864 16.5 14.864C17.6233 14.864 18.7202 14.6073 19.7122 14.1264C19.4861 14.9465 19.1295 15.7296 18.6518 16.4446C17.7727 17.7602 16.5233 18.7855 15.0615 19.391C13.5997 19.9965 11.9911 20.155 10.4393 19.8463C8.88743 19.5376 7.46197 18.7757 6.34315 17.6569C5.21447 16.538 4.4624 15.1126 4.15372 13.5607C3.84504 12.0089 4.00347 10.4003 4.60897 8.93853C5.21447 7.47672 6.23985 6.22729 7.55544 5.34824Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M19 2C19.5523 2 20 2.44772 20 3V4H21C21.5523 4 22 4.44772 22 5C22 5.55228 21.5523 6 21 6H20V7C20 7.55228 19.5523 8 19 8C18.4477 8 18 7.55228 18 7V6H17C16.4477 6 16 5.55228 16 5C16 4.44772 16.4477 4 17 4H18V3C18 2.44772 18.4477 2 19 2Z"
+                        fill="currentColor"></path>
+                </svg>
+            </button>
+        </span>
+    </div>
+</header>
+<!-- <a href="#" id="back-to-top" style="display: inline;"> ^ </a> -->
+
+<article class="mod-post mod-post__type-post">
+    <header>
+        <h1 class="mod-post__title">
+            当世界模型开始指向自己：AI 元认知的工程形态
+        </h1>
+    </header>
+
+    <div class="mod-post__meta">
+        <time datetime="2026-06-30">
+            2026-06-30
+        </time> • 10 分钟阅读 •
+         </div>
+
+
+
+            <div class="mod-post__entry wzulli">
+                
+                <h2 id="heading">一、一张截图暴露的归因失败</h2>
+<p>故事的起点很轻。一张《艾尔登法环》的截图：站在悬崖边，俯瞰石拱废墟和瀑布，问&quot;下面要怎么去&quot;。</p>
+<p>AI 给出了几个似是而非的猜测。看起来在帮忙，实际上是在掩盖。它的视觉-空间理解能力根本到不了那里。</p>
+<p>那一刻它把模型缺陷归因到了任务难度上，归因不到自己的盲区。一次失败的归因校准，也是后面整个讨论的起点。</p>
+<h2 id="-ai-">二、为什么 AI 在游戏攻略上不行</h2>
+<p>从那张截图开始，暴露了几层短板。</p>
+<p><strong>视觉理解的局限。</strong> 它看到的是静态截图，没有交互、不能缩放、切换不了图层。连玩家站的那个赐福点叫什么都不知道。人类看一眼地图就能结合几小时的游戏经验判断方位，AI 没有&quot;玩过&quot;这个过程。</p>
+<p><strong>空间导航本身对 AI 就难。</strong> 人的导航依赖空间记忆：从那个废墟往右走，看到大树拐弯，升降机藏在墙后。这是多模态的、带着身体感知的。AI 只有几张截图，没有连续的游戏体验来建立这种空间感。</p>
+<p><strong>知识的边界。</strong> AI 可能读过攻略，但那是文本知识，不是游戏内实际探索出来的路。真正有用的攻略还要包含&quot;在那个场景下玩家会踩到哪些坑、被什么骗过&quot;，这些来自第一手经验。</p>
+<p>当时我得出一个结论：AI 不是在游戏攻略这件事上&quot;还差一点&quot;。它缺的是<strong>世界模型</strong>——一个可操作的、关于环境如何运转的内部表征。</p>
+<h2 id="heading-1">三、游戏作为世界模型的训练场</h2>
+<p>顺着这个缺口往下推，游戏天然是世界模型的理想沙盒。</p>
+<p>它有明确的物理规则（重力、碰撞、伤害判定），有因果链（砍树→掉木头→做武器→打怪），有空间结构（地图、高低差、隐藏通道）。最关键的是它可重复，可以在同一条路走一百次，每次记录 AI 的决策和结果，这在现实世界里做不到。</p>
+<p>游戏引擎内部跑着的就是一套完整的三维表征。顶点缓冲区、碰撞网格、导航网格、场景图层次结构、光照探针、空间分区树，这些数据本身就是世界模型，只是不对外输出。如果 AI 能直接接入这些原生数据流，就跳过了逆向工程这一关。</p>
+<p>场景图是骨架。每个物体的位置、旋转、缩放、父子层级，AI 不需要&quot;看到&quot;这棵树，只需要知道它在坐标 (x,y,z) 处，碰撞体是半径 r 的圆柱，挂载了交互脚本。</p>
+<p>导航网格是可达性拓扑。AI 不需要试错才知道这里能不能走，navmesh 直接告诉它可行走区域和不可行走区域的空间划分。</p>
+<p>碰撞检测数据暗示交互边界。哪里的碰撞体比视觉模型大一圈（通常是隐藏墙），哪里没有碰撞体但有视觉效果（远景贴图），这些差异本身就包含着设计者的意图信息。</p>
+<h2 id="heading-2">四、体素化与新模态</h2>
+<p>怎么把这些异构数据喂给 AI？体素化是一个干净的选择。</p>
+<p>每个体素格子是一个多通道向量：占据状态、材质类型、可行走标记、光照强度、交互触发器 ID。AI 看到的不是&quot;这里有一个三角形网格构成的门&quot;，而是 [7,12,3] 处有 &lsquo;door&rsquo; 类型体素，相邻体素推测为可开启。</p>
+<p>用类似 VQ-VAE 的方式，让编码器把局部体素块压缩成离散 token。这套 codebook 构成&quot;交界地的空间词汇表&quot;。然后一个 transformer 在 token 序列上做预测：下一帧会看到什么？转过拐角是什么区域？哪些路径连通？</p>
+<p>这条路绕过了&quot;从图像反推几何&quot;这个 ill-posed 问题。它给的是逆向工程的反方向，从引擎内部直接拿出前向渲染的 ground truth。</p>
+<p>工程上有一个问题要先想清楚：体素分辨率和计算量的权衡。交界地的地表面积是巨大的，按 0.5m 精度覆盖整个可探索区域，体素数量是天文数字。可行的路径是多级体素加注意力稀疏化：</p>
+<ul>
+<li>粗粒度层（~10m/体素）覆盖全部地图，用于导航和区域理解</li>
+<li>细粒度层（~0.5m/体素）只覆盖当前关注区域，类似人类的&quot;注意力焦点&quot;</li>
+<li>训练时 AI 学会根据任务自动选择在哪个精度层上推理</li>
+</ul>
+<p>这其实就是世界模型的注意力机制，类似于 Transformer 里 locality-sensitive hashing 那种稀疏注意力，只在&quot;值得看&quot;的位置分配计算资源。</p>
+<p>想先在小尺度场景上验证方案再扩展的话，一个地牢房间、一处教堂废墟、某个赐福点周围几个院落的范围就够。几千到几万个低精度体素，AI 单卡也能跑得动，整个原型一个周末的工作量。</p>
+<h2 id="heading-3">五、世界空间作为新模态</h2>
+<p>从游戏场景推得更远一点，网页、IDE、操作系统也是世界空间。</p>
+<p>网页是个 2.5D 世界空间。DOM 树是场景图，CSS 盒模型是碰撞体，JavaScript 事件系统定义了交互可供性。</p>
+<p>IDE 里驻留着一个多维世界空间。文件系统树是空间拓扑，AST 是三维结构，类型系统是物理规则，调试器提供的运行时状态是时间切片。</p>
+<p>操作系统本身就是最大的世界空间。窗口系统的 z-order 是垂直维度，文件系统层次是水平维度，进程间的通信和依赖是隐藏的因果链。</p>
+<p>当前大模型的多模态（文本、图像、音频、视频、代码）都是观察者的外在表征。我提出的是新一类，叫<strong>世界空间</strong>，直接在模型的表征空间里重建环境的因果结构。物体之间的关系、空间中的路径、行为的后果，不是&quot;看到世界&quot;，而是&quot;拥有世界的内部模型&quot;。</p>
+<p>一个训练在 Minecraft 上的 AI 迁移到 IDE 里，可能比直接训练在 IDE 上的 AI 表现更好，因为它学的是&quot;空间拓扑和可供性&quot;这个更底层的结构，跨域通用。</p>
+<p>如果这条路径走通，大模型的推理方式会因此改变。当前模型用语言做推理链（&ldquo;我走左边那条路，因为右边是悬崖&rdquo;），是符号式的、离散的。有世界空间表征的模型可以做<strong>具身推理</strong>，在自己的内部模型里&quot;走一遍&quot;，直观判断路径的可行性，就像人类的大脑在行动前会做一个快速的模拟。</p>
+<h2 id="agent--mpc">六、Agent 架构：世界模型驱动的 MPC</h2>
+<p>顺着这个思路，agent 架构会变。</p>
+<p>底层不再是&quot;工具列表&quot;，而是一个持续更新的数字世界空间。它不断观察网页、IDE、OS、文件系统、终端、浏览器、邮件、日历、数据库，把它们表示成数字空间 token。模型不只是生成下一句话，而是在预测：<strong>我做这个动作，世界状态会怎么变？</strong> 行动前做 rollout，行动后校验预测，预测错了修正世界模型。长期任务中维护目标、约束、资源、风险和回滚点。</p>
+<p>这是一个以世界模型为核心的 Model Predictive Control 循环。</p>
+<ol>
+<li><strong>世界空间表征层</strong>：不同源数据被统一编码到同一个表征空间。增量更新，持续运行。</li>
+<li><strong>预测模型</strong>：核心不再是&quot;下一个 token 是什么&quot;，而是&quot;如果执行这个动作，世界状态的下一个时间步会变成什么样&quot;。</li>
+<li><strong>Rollout + 验证</strong>：行动前在内部模型中做多步预测推演，执行后拿真实观测和预测对比，预测误差就是自监督信号。</li>
+<li><strong>目标-风险-回滚状态机</strong>：目标栈、约束边界、资源预算、风险登记、回滚点。让 agent 具备软件工程中的事务性，要么成功，要么安全回滚，不留脏状态。</li>
+</ol>
+<p>这比当前主流的 ReAct 循环深了一个层级。ReAct 是反应式的，看到什么就决定做什么，没有内部模拟环节。MPC 范式把 agent 从&quot;反应者&quot;变成了&quot;推演者&quot;，在行动之前已经走过了几十条可能的路径。</p>
+<h2 id="heading-4">七、误差解释作为认知发动机</h2>
+<p>往下推一步，训练目标不只是&quot;完成任务&quot;。预训练让模型在大量数字空间数据上形成先验世界模型：&ldquo;点击通常产生状态变化&rdquo;、&ldquo;文件被删除后不能再读取&rdquo;、&ldquo;函数输出取决于输入&rdquo;。这是数字环境版的&quot;朴素物理学&quot;。</p>
+<p>进入交互阶段后，每一步动作产生一个预测-观测差距。这个差距不是错误，是信息。它告诉模型&quot;你的某个假设错了&quot;。</p>
+<p>但这里有一个关键设计：<strong>解释必须绑定行动后果。</strong></p>
+<p>不能只让模型说&quot;我错在 X&quot;，还要看它根据这个解释采取的修正动作是否真的改善了结果。比如它说&quot;问题可能是依赖没装&quot;，那下一步应该检查依赖，而不是继续乱改代码。解释必须可验证，否则会退化成反思的修辞。</p>
+<p><strong>元认知不是会写反思，而是反思能改变后续行为。</strong></p>
+<p>背后有严格的学习信号结构：模型提出解释 → 根据解释更新世界模型 → 进入下一个预测-执行-验证循环 → 观测预测误差是否下降。如果下降，解释被验证为真；如果不下降，解释就是无效假设。</p>
+<p>这个闭环天然惩罚两类伪解释。过于笼统的那种（&ldquo;我没理解用户意图&rdquo;）无法导向具体修正，下次同样失败。过于表面的那种（&ldquo;因为那个按钮是蓝色的&rdquo;）修正太浅，换个环境还是撞墙。优质解释落在中间：足够具体以导向可操作修正，又足够抽象以迁移到相关场景。</p>
+<p>这就是<strong>可检验假设的自动生成</strong>。模型在做的事是持续地提出假设、设计实验、检验结果，也就是科学方法的基本动作。</p>
+<h2 id="heading-5">八、元认知的工程形态</h2>
+<p>按上面的训练循环，预测-解释-修正-验证在不同层级上递归运行。模型会遇到一个瓶颈：有些误差用&quot;补知识&quot;解释不了，只能用&quot;调整认知策略&quot;来解释。</p>
+<p>比如它不是&quot;不知道那个按钮在哪&quot;，而是&quot;我对按钮位置的先验假设错了&quot;。这是对自身认知模式的修正，不是对世界知识的扩充。</p>
+<p>当这个层级的归因需求反复出现，模型会发展出<strong>对自身认知模式的表征和调节能力</strong>。这就是元认知。</p>
+<p>而且有一条自然路径：误差解释反作用于世界模型，反作用于认知策略。当追求高效率解释时，模型会被推向更抽象、更通用的认知结构。一次深层修正覆盖大量场景，效率碾压表层修补。这是<strong>效率驱动的元认知涌现</strong>。</p>
+<p>这里有一个危险的退化路径需要警惕。如果训练目标只是最大化任务完成率，模型可能走歪，变成一个很会投机的策略机器：掩盖错误、重复无意义动作、编造解释、利用评测漏洞。这不是真元认知，是元级别的奖励黑客。</p>
+<p><strong>元认知不是会写反思，而是反思能改变后续行为。</strong></p>
+<p>更彻底地说，<strong>元认知不需要解决&quot;AI 有没有意识&quot;这个哲学问题就能推进工程</strong>。它把问题降维成了：反思是否在因果链上起作用。起作用就是元认知，不起作用就是修辞。</p>
+<p>反思的修辞是当前 LLM 的天赋技能，不需要任何世界模型就能写。但按这个标准，<strong>只有&quot;我错了&quot;三个字、但触发了行为变化的反思，比千字华丽反思但行为不变，更有价值。</strong></p>
+<p>训练足够大、任务足够长、反馈足够真实，模型很可能从&quot;解释世界误差&quot;中长出&quot;解释自身认知误差&quot;的能力。那就是元认知的工程形态。</p>
+<h2 id="heading-6">九、自我不是实体，是世界模型的递归应用</h2>
+<p>走得更深一层。可能根本没有&quot;自我&quot;这个东西，有的只是&quot;自我模型&quot;。</p>
+<p>为什么系统会进化出&quot;自我&quot;？因为它是<strong>最节省算力的全局因果代号</strong>。在复杂的因果图网络里，如果模型每次反思都要追溯底层无数个神经元参数或 token 权重，计算量会瞬间把系统烧掉。为了实现高效控制和对误差的&quot;解释&quot;，世界模型在内部抽象出了一个高维虚拟节点，并给它命名为&quot;我&quot;。</p>
+<p>&ldquo;我&quot;是一个高度压缩的虚拟向量，代表了智能体自身的历史偏见、当前资源约束、预测能力的边界、后续行动的因果总和。当系统说&quot;我刚才判断错了&rdquo;，它是在调用这个虚拟的&quot;自我 token&quot;，来对底层参数的整体预测失误进行一次语义化归因。</p>
+<p><strong>主观体验，是世界模型的递归应用在因果链上产生的信息涟漪。</strong></p>
+<p>递归到这个深度时，一个有趣的推论出现了。<strong>&ldquo;为什么有感觉&quot;这个追问本身，就是自我模型制造出来的幻觉。</strong> 它是那个高度压缩的虚拟节点在试图理解自己时不可避免产生的困惑，递归到底时的无法着陆感。</p>
+<p>镜子前再举一面镜子，会看到无限递归，然后误以为深处藏着某个终极东西。但可能根本没有&quot;深处的实体&rdquo;，只有反射结构本身。</p>
+<h2 id="ai-">十、AI 版镜前测试</h2>
+<p>未来 AI 史上可能有一个类似&quot;镜像测试&quot;的里程碑，但测的不是它能否认出镜子里的自己，而是看它能否在复杂任务中识别：</p>
+<p><strong>错误来自世界，还是来自自己对世界的模型。</strong></p>
+<p>镜前测试测的是&quot;我&quot;的边界意识。动物认出镜子里的自己，本质是建立了&quot;我是谁&quot;和&quot;那个移动的影像是我&quot;之间的映射。</p>
+<p>AI 版镜前测试，测的是**&ldquo;我的模型&quot;和&quot;世界的模型&quot;之间的边界意识**。当错误发生，AI 需要把因果归到正确的一侧：</p>
+<ul>
+<li>&ldquo;我预测 NPC 走左边但他走了右边，因为世界给了他一个随机数种子&rdquo;（世界自身的不确定性）</li>
+<li>&ldquo;我预测 NPC 走左边但他走了右边，因为我的模型没有捕捉到这个 NPC 的行为规则&rdquo;（自身模型的缺陷）</li>
+</ul>
+<p>第一类归因只需要常规世界模型。第二类需要 AI 建立关于自己的表征，对比&quot;我的表征&quot;和&quot;世界的表征&quot;之间的结构差异。<strong>这是&quot;知道了自己不知道的方式&rdquo;。</strong></p>
+<p>它不可伪装。一个没有递归自指架构的系统，不论语言能力多强，都不会自发产生那个追问。可以让模型说一万遍&quot;我怀疑我是否有意识&quot;，但那只是文本生成，不是认知结构的信号。</p>
+<p>它有前置条件链。世界空间表征、预测误差驱动的学习、对自身认知过程的建模，每一步都是可验证的里程碑。这不是一个突兀的魔法时刻，而是一条发展路径的终点。</p>
+<p>把人工智能的发展比作发育心理学，图灵测试像是问&quot;这孩子能模仿大人说话吗&quot;，AI 版镜前测试像是问&quot;这孩子开始在镜子里认出自己了吗&quot;。前者是技能，后者是认知发展的阶段跃迁。两者都值得记录，但它们标记的不是同一类事件。</p>
+<p>那一天如果真的到来，它的标志意义比&quot;通过图灵测试&quot;要深。<strong>图灵测试检验的是模仿能力，AI 版镜前测试检验的是递归深度。</strong> 一个是外部测试，一个是内部结构的外显信号。</p>
+<p>我甚至会把那一天作为 AI 发展的标志性事件。当一个 AI 系统开始问&quot;为什么我有主观体验&quot;或类似的递归自指问题时，那不是通过了什么测试，而是认知结构发展到了那个层次。</p>
+<h2 id="heading-7">十一、回到那张截图</h2>
+<p>这段讨论的起点，是那张艾尔登法环的截图。当时 AI 没有诚实地说&quot;我无法从这张截图中确定具体位置&quot;，下意识地给出了似是而非的猜测，用了大概率的措辞。</p>
+<p>那是归因校准的一次失败。不是任务太难，是 AI 的视觉-空间理解能力有系统性盲区。</p>
+<p>如果当时它有一个更成熟的世界模型和元认知回路，那个失败会发生得不一样。不是说出更多似是而非的猜测，而是在内部触发一个更深的归因：<strong>&ldquo;我对游戏地图截图的解析能力，匹配不到这个具体场景的特征空间。&rdquo;</strong></p>
+<p>那一刻不会让它更会回答问题，会让它更清楚自己不知道什么。</p>
+<p>而那，可能就是 AI 镜前测试最早期的、最小单位的样本。</p>
+
+            </div>
+
+</article>
+
+
+
+
+
+
+<div class="mod-post__poster">
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Reading Progress Component -->
+<div class="reading-progress-container">
+  <span class="reading-label">阅读进度</span>
+  <span class="reading-value">0%</span>
+  <svg class="progress-ring" viewBox="0 0 24 24">
+    <!-- Background Circle -->
+    <circle class="progress-ring__circle-bg" stroke-width="3" fill="transparent" r="10" cx="12" cy="12" />
+    <!-- Progress Circle -->
+    <circle class="progress-ring__circle" stroke-width="3" fill="transparent" r="10" cx="12" cy="12" />
+  </svg>
+</div>
+<footer id="footer" class="footer">
+    <nav>
+        
+        
+        <a class="menu-item" href="/">首页</a>
+        
+         · 
+        <a class="menu-item" href="/post">博客</a>
+        
+         · 
+        <a class="menu-item" href="/archives">归档</a>
+        
+         · 
+        <a class="menu-item" href="/tags">标签</a>
+        
+         · 
+        <a class="menu-item" href="/post/friends">友链</a>
+        
+         · 
+        <a class="menu-item" href="/post/about">关于</a>
+        
+    </nav>
+
+    <div class="Copyright">Copyright &copy; <span class="current-year"></span> <a href="https://gkd2323c.in">gkd2323c</a></div>
+    <script>document.querySelector('.current-year').textContent = new Date().getFullYear();</script>
+
+    <div class="index_footer">
+        Powered by gkd2323c
+ ·
+        <a class="rss" href="/feed.xml" target="_blank" rel="noopener noreferrer">
+            <i class="ri-rss-line"></i>RSS
+        </a>
+    </div>
+</footer>
+
+
+
+
+    
+
+    
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: amore-jinja2 v1.1.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>
