@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+<meta name="viewport"
+    content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, width=device-width" />
+<meta name="renderer" content="webkit">
+<meta name="format-detection" content="telephone=no, email=no, address=no">
+
+
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#292a2d" media="(prefers-color-scheme: dark)">
+
+
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/gkd2323c/blog_cdn@main/images/theme/appicon.png">
+<link rel="stylesheet" href="/styles/main.min.css">
+
+
+<style>:root{--accent-color:#28df99;}</style>
+
+
+<script>
+    // 自动为所有 target="_blank" 的链接添加 rel="noopener noreferrer"
+    document.addEventListener('DOMContentLoaded', function () {
+        var links = document.querySelectorAll('a[target="_blank"]');
+        links.forEach(function (link) {
+            var rel = link.getAttribute('rel') || '';
+            if (rel.indexOf('noopener') === -1) {
+                rel += ' noopener';
+            }
+            if (rel.indexOf('noreferrer') === -1) {
+                rel += ' noreferrer';
+            }
+            link.setAttribute('rel', rel.trim());
+        });
+    });
+</script>
+
+<script>
+    // declaraction of document.ready() function.
+    (function () {
+        var ie = !!(window.attachEvent && !window.opera);
+        var wk = /webkit\/(\d+)/i.test(navigator.userAgent) && (RegExp.$1 < 525);
+        var fn = [];
+        var run = function () {
+            for (var i = 0; i < fn.length; i++) fn[i]();
+        };
+        var d = document;
+        d.ready = function (f) {
+            if (!ie && !wk && d.addEventListener)
+                return d.addEventListener('DOMContentLoaded', f, false);
+            if (fn.push(f) > 1) return;
+            if (ie)
+                (function () {
+                    try {
+                        d.documentElement.doScroll('left');
+                        run();
+                    } catch (err) {
+                        setTimeout(arguments.callee, 0);
+                    }
+                })();
+            else if (wk)
+                var t = setInterval(function () {
+                    if (/^(loaded|complete)$/.test(d.readyState))
+                        clearInterval(t), run();
+                }, 0);
+        };
+    })();
+
+
+    document.ready(
+        function () {
+            var _Blog = window._Blog || {};
+
+            const getSystemTheme = () => {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    return 'dark';
+                }
+                return 'light';
+            };
+
+            const configDefault = 'dark';
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme');
+            const initialTheme = currentTheme || configDefault || getSystemTheme();
+            const isDark = initialTheme === 'dark';
+
+            const updateButtons = (dark) => {
+                const sunBtn = document.getElementById("theme-toggle-sun");
+                const moonBtn = document.getElementById("theme-toggle-moon");
+                const mobileSunBtn = document.getElementById("mobile-theme-toggle-sun");
+                const mobileMoonBtn = document.getElementById("mobile-theme-toggle-moon");
+
+                if (dark) {
+                    if (sunBtn) sunBtn.style.display = 'none';
+                    if (moonBtn) moonBtn.style.display = 'inline-block';
+                    if (mobileSunBtn) mobileSunBtn.style.display = 'none';
+                    if (mobileMoonBtn) mobileMoonBtn.style.display = 'inline-block';
+                } else {
+                    if (sunBtn) sunBtn.style.display = 'inline-block';
+                    if (moonBtn) moonBtn.style.display = 'none';
+                    if (mobileSunBtn) mobileSunBtn.style.display = 'inline-block';
+                    if (mobileMoonBtn) mobileMoonBtn.style.display = 'none';
+                }
+            };
+
+            const updateThemeColor = (dark) => {
+                const themeColor = dark ? '#292a2d' : '#ffffff';
+                const metaTags = document.querySelectorAll('meta[name="theme-color"]');
+                if (metaTags.length > 0) {
+                    // 保留第一个，移除其他的，避免重复
+                    for (let i = 1; i < metaTags.length; i++) {
+                        metaTags[i].remove();
+                    }
+                    metaTags[0].setAttribute('content', themeColor);
+                    metaTags[0].removeAttribute('media');
+                } else {
+                    const meta = document.createElement('meta');
+                    meta.name = 'theme-color';
+                    meta.content = themeColor;
+                    document.head.appendChild(meta);
+                }
+            };
+
+            const applyTheme = (dark) => {
+                const body = document.getElementsByTagName('body')[0];
+                if (dark) {
+                    body.classList.add('dark-theme');
+                } else {
+                    body.classList.remove('dark-theme');
+                }
+                updateButtons(dark);
+                updateThemeColor(dark);
+            };
+
+            // Initial application
+            applyTheme(isDark);
+            if (!currentTheme) {
+                window.localStorage && window.localStorage.setItem('theme', initialTheme);
+            }
+
+            _Blog.toggleTheme = function () {
+                const toggleFunc = (e) => {
+                    // Prevent bubbling if needed, though buttons are distinct now
+                    if (e) e.stopPropagation();
+
+                    const body = document.getElementsByTagName('body')[0];
+                    const isCurrentlyDark = body.classList.contains('dark-theme');
+
+                    if (isCurrentlyDark) {
+                        body.classList.remove('dark-theme');
+                        updateButtons(false);
+                        window.localStorage && window.localStorage.setItem('theme', 'light');
+                    } else {
+                        body.classList.add('dark-theme');
+                        updateButtons(true);
+                        window.localStorage && window.localStorage.setItem('theme', 'dark');
+                    }
+                };
+
+                const sunBtn = document.getElementById("theme-toggle-sun");
+                const moonBtn = document.getElementById("theme-toggle-moon");
+                const mobileSunBtn = document.getElementById("mobile-theme-toggle-sun");
+                const mobileMoonBtn = document.getElementById("mobile-theme-toggle-moon");
+
+                if (sunBtn) sunBtn.addEventListener('click', toggleFunc);
+                if (moonBtn) moonBtn.addEventListener('click', toggleFunc);
+                if (mobileSunBtn) mobileSunBtn.addEventListener('click', toggleFunc);
+                if (mobileMoonBtn) mobileMoonBtn.addEventListener('click', toggleFunc);
+            };
+            _Blog.toggleTheme();
+
+            if (window.matchMedia && !configDefault) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                    const newTheme = e.matches ? 'dark' : 'light';
+                    applyTheme(e.matches);
+                    window.localStorage && window.localStorage.setItem('theme', newTheme);
+                });
+            }
+        }
+    );
+</script>
+
+<script>
+    // Reading Progress Component
+    document.addEventListener('DOMContentLoaded', () => {
+        const progressValue = document.querySelector('.reading-value');
+        const progressCircle = document.querySelector('.progress-ring__circle');
+        const container = document.querySelector('.reading-progress-container');
+
+        // Exit if elements don't exist (e.g., not on a post page)
+        if (!progressValue || !progressCircle || !container) {
+            return;
+        }
+
+        // SVG Circle setup
+        const radius = progressCircle.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
+
+        progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+        progressCircle.style.strokeDashoffset = circumference;
+
+        function setProgress(percent) {
+            const safePercent = Math.min(100, Math.max(0, percent));
+            progressValue.textContent = `${Math.round(safePercent)}%`;
+            const offset = circumference - (safePercent / 100) * circumference;
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        function onScroll() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+
+            if (scrollHeight <= 0) {
+                setProgress(0);
+                return;
+            }
+
+            const scrollPercent = (scrollTop / scrollHeight) * 100;
+            setProgress(scrollPercent);
+
+            // Show/Hide logic: Show if scrolled more than 100px
+            if (scrollTop > 100) {
+                container.classList.add('show');
+            } else {
+                container.classList.remove('show');
+            }
+        }
+
+        // Initialize
+        onScroll();
+
+        // Listen for scroll events
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // Recalculate on resize
+        window.addEventListener('resize', onScroll);
+    });
+</script>
+
+
+
+
+
+
+
+    <meta name="generator" content="Gridea Pro 1.2.2">
+    <title>阅读笔记：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation | gkd2323c</title>
+
+    
+<meta name="description" content="阅读笔记：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation 论文：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation **arXi&amp;hellip;">
+<link rel="canonical" href="https://gkd2323c.in/post/yue-du-bi-jidspark-confidence-scheduled-speculative-decoding-with-semi-autoregressive-generation/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"阅读笔记：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation","url":"https://gkd2323c.in/post/yue-du-bi-jidspark-confidence-scheduled-speculative-decoding-with-semi-autoregressive-generation/","description":"阅读笔记：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation 论文：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation **arXi\u0026hellip;","datePublished":"2026-07-08T05:22:37+08:00","dateModified":"2026-07-07T21:25:35+08:00","author":{"@type":"Person","name":"gkd2323c"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"gkd2323c"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://gkd2323c.in","name":"gkd2323c","position":1},{"@type":"ListItem","item":"https://gkd2323c.in/post/yue-du-bi-jidspark-confidence-scheduled-speculative-decoding-with-semi-autoregressive-generation/","name":"阅读笔记：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation","position":2}]}</script>
+<meta property="og:title" content="阅读笔记：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation">
+<meta property="og:description" content="阅读笔记：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation 论文：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation **arXi&amp;hellip;">
+<meta property="og:url" content="https://gkd2323c.in/post/yue-du-bi-jidspark-confidence-scheduled-speculative-decoding-with-semi-autoregressive-generation/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="gkd2323c">
+<meta property="og:image" content="/images/avatar.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://gkd2323c.in/post/yue-du-bi-jidspark-confidence-scheduled-speculative-decoding-with-semi-autoregressive-generation/">
+<meta name="twitter:title" content="阅读笔记：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation">
+<meta name="twitter:description" content="阅读笔记：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation 论文：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation **arXi&amp;hellip;">
+<meta name="twitter:image" content="/images/avatar.png">
+</head>
+
+<body class="">
+
+    
+<script>
+    (function () {
+        const getSystemTheme = () => {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                return 'dark';
+            }
+            return 'light';
+        };
+
+        const configDefault = 'dark';
+        const savedTheme = localStorage.getItem('theme');
+        const theme = savedTheme || configDefault || getSystemTheme();
+
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+
+        if (!savedTheme) {
+            localStorage.setItem('theme', theme);
+        }
+    })();
+</script>
+<header class="mod-head">
+    <div class="mod-head__left">
+        <div class="mod-head__logo">
+            <a href="/">
+                
+                <img class="avatar" alt="avatar" src="https://cdn.jsdelivr.net/gh/gkd2323c/blog_cdn@main/images/theme/appicon.png">
+                
+            </a>
+        </div>
+    </div>
+
+    <div class="mod-head__right">
+        <span>
+            <button id="theme-toggle-sun" class="tiptap-button theme-toggle-sun" aria-label="Switch to dark mode">
+                <svg width="18" height="18" class="tiptap-button-icon" viewBox="0 0 24 24" fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 1C12.5523 1 13 1.44772 13 2V4C13 4.55228 12.5523 5 12 5C11.4477 5 11 4.55228 11 4V2C11 1.44772 11.4477 1 12 1Z"
+                        fill="currentColor"></path>
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M13 20C13 19.4477 12.5523 19 12 19C11.4477 19 11 19.4477 11 20V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V20Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M4.22282 4.22289C4.61335 3.83236 5.24651 3.83236 5.63704 4.22289L7.04704 5.63289C7.43756 6.02341 7.43756 6.65658 7.04704 7.0471C6.65651 7.43762 6.02335 7.43762 5.63283 7.0471L4.22282 5.6371C3.8323 5.24658 3.8323 4.61341 4.22282 4.22289Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M18.367 16.9529C17.9765 16.5623 17.3433 16.5623 16.9528 16.9529C16.5623 17.3434 16.5623 17.9766 16.9528 18.3671L18.3628 19.7771C18.7533 20.1676 19.3865 20.1676 19.777 19.7771C20.1675 19.3866 20.1675 18.7534 19.777 18.3629L18.367 16.9529Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M1 12C1 11.4477 1.44772 11 2 11H4C4.55228 11 5 11.4477 5 12C5 12.5523 4.55228 13 4 13H2C1.44772 13 1 12.5523 1 12Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M20 11C19.4477 11 19 11.4477 19 12C19 12.5523 19.4477 13 20 13H22C22.5523 13 23 12.5523 23 12C23 11.4477 22.5523 11 22 11H20Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M7.04704 16.9529C7.43756 17.3434 7.43756 17.9766 7.04704 18.3671L5.63704 19.7771C5.24651 20.1676 4.61335 20.1676 4.22282 19.7771C3.8323 19.3866 3.8323 18.7534 4.22283 18.3629L5.63283 16.9529C6.02335 16.5623 6.65651 16.5623 7.04704 16.9529Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M19.777 5.6371C20.1675 5.24657 20.1675 4.61341 19.777 4.22289C19.3865 3.83236 18.7533 3.83236 18.3628 4.22289L16.9528 5.63289C16.5623 6.02341 16.5623 6.65658 16.9528 7.0471C17.3433 7.43762 17.9765 7.43762 18.367 7.0471L19.777 5.6371Z"
+                        fill="currentColor"></path>
+                </svg>
+            </button>
+            <button id="theme-toggle-moon" class="tiptap-button theme-toggle-moon" aria-label="Switch to light mode">
+                <svg width="18" height="18" class="tiptap-button-icon" viewBox="0 0 24 24" fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 11.5955 21.7564 11.2309 21.3827 11.0761C21.009 10.9213 20.5789 11.0069 20.2929 11.2929C19.287 12.2988 17.9226 12.864 16.5 12.864C15.0774 12.864 13.713 12.2988 12.7071 11.2929C11.7012 10.287 11.136 8.92261 11.136 7.5C11.136 6.07739 11.7012 4.71304 12.7071 3.70711C12.9931 3.42111 13.0787 2.99099 12.9239 2.61732C12.7691 2.24364 12.4045 2 12 2ZM7.55544 5.34824C8.27036 4.87055 9.05353 4.51389 9.87357 4.28778C9.39271 5.27979 9.13604 6.37666 9.13604 7.5C9.13604 9.45304 9.91189 11.3261 11.2929 12.7071C12.6739 14.0881 14.547 14.864 16.5 14.864C17.6233 14.864 18.7202 14.6073 19.7122 14.1264C19.4861 14.9465 19.1295 15.7296 18.6518 16.4446C17.7727 17.7602 16.5233 18.7855 15.0615 19.391C13.5997 19.9965 11.9911 20.155 10.4393 19.8463C8.88743 19.5376 7.46197 18.7757 6.34315 17.6569C5.21447 16.538 4.4624 15.1126 4.15372 13.5607C3.84504 12.0089 4.00347 10.4003 4.60897 8.93853C5.21447 7.47672 6.23985 6.22729 7.55544 5.34824Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M19 2C19.5523 2 20 2.44772 20 3V4H21C21.5523 4 22 4.44772 22 5C22 5.55228 21.5523 6 21 6H20V7C20 7.55228 19.5523 8 19 8C18.4477 8 18 7.55228 18 7V6H17C16.4477 6 16 5.55228 16 5C16 4.44772 16.4477 4 17 4H18V3C18 2.44772 18.4477 2 19 2Z"
+                        fill="currentColor"></path>
+                </svg>
+            </button>
+        </span>
+    </div>
+</header>
+<!-- <a href="#" id="back-to-top" style="display: inline;"> ^ </a> -->
+
+<article class="mod-post mod-post__type-post">
+    <header>
+        <h1 class="mod-post__title">
+            阅读笔记：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation
+        </h1>
+    </header>
+
+    <div class="mod-post__meta">
+        <time datetime="2026-07-08">
+            2026-07-08
+        </time> • 17 分钟阅读 •
+         </div>
+
+
+
+            <div class="mod-post__entry wzulli">
+                
+                <h1 id="dspark-confidence-scheduled-speculative-decoding-with-semi-autoregressive-generation">阅读笔记：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation</h1>
+<ul>
+<li><strong>论文</strong>：DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation</li>
+<li><strong>arXiv</strong>：<a href="https://arxiv.org/abs/2607.05147">2607.05147v1</a></li>
+<li><strong>发布时间</strong>：2026-07-06</li>
+<li><strong>主类目</strong>：cs.AI，另含 cs.CL</li>
+<li><strong>主题</strong>：大模型推理加速、speculative decoding、半自回归草稿模型、系统感知调度、生产 serving</li>
+<li><strong>一句话概括</strong>：DSpark 把 speculative decoding 从“每个请求尽量多猜几个 token”换成“看全系统负载，只验证划算的草稿前缀”。</li>
+</ul>
+<hr />
+<h2 id="1-">1. 论文要解决的问题</h2>
+<p>大模型自回归生成，每吐一个 token 就要目标模型跑一次 forward。输出越长延迟越高，decode 阶段 GPU 还经常吃不饱。</p>
+<p>Speculative decoding 的思路很朴素：先让一个便宜的 draft model 猜一段候选 token，再由完整 target model 一次并行验证。配合拒绝采样，它能在不改变目标模型输出分布的前提下，砍掉目标模型的调用次数。</p>
+<p>论文说，这套东西搬到生产环境会撞上两个瓶颈。</p>
+<h3 id="11-">1.1 草稿质量瓶颈</h3>
+<p>并行 drafter 一次能吐好几个 draft token，快，但位置之间没有真实依赖。要是上下文同时容得下几种续写，比如：</p>
+<ul>
+<li>“of course”</li>
+<li>“no problem”</li>
+</ul>
+<p>并行模型会在各个位置各自对所有路径取平均，拼出 “of problem”“no course” 这种前言不搭后语的组合。论文管这叫 <strong>multi-modal collision</strong>。后果是越往后的 draft token 越容易被目标模型拒掉，也就是 <strong>suffix acceptance decay</strong>。</p>
+<h3 id="12-">1.2 系统吞吐瓶颈</h3>
+<p>drafter 能吐出很长的候选块，不等于这些 token 都值得送去验证。</p>
+<p>低并发时多验几个 token 无所谓。高并发就不一样了：每多验一个大概率要被拒的 token，都在占目标模型的 batch capacity，把其他活跃请求挤出去。验证预算于是从单请求的贪心，变成一个系统级的资源分配问题。真正要回答的是，在当前请求分布和系统负载下，每个请求该验证几个 draft token。</p>
+<p>这个长度显然不能是常数，得同时看请求难度、draft 置信度，还有 serving 引擎此刻的负载。</p>
+<hr />
+<h2 id="2-dspark-">2. DSpark 的核心设计</h2>
+<p>DSpark 有两个主要组件：</p>
+<ol>
+<li><strong>Semi-Autoregressive Generation</strong>：用半自回归结构改善并行 drafter 的后缀质量。</li>
+<li><strong>Confidence-Scheduled Verification</strong>：用置信度和硬件吞吐曲线动态选择验证前缀长度。</li>
+</ol>
+<h3 id="21--backbone-">2.1 半自回归生成：并行 backbone 加轻量顺序头</h3>
+<p>DSpark 的 drafter 分成两段。</p>
+<h4 id="heading">并行阶段</h4>
+<p>并行 backbone 类似 DFlash，一次 forward 处理整个 draft block，吐出每个位置的 hidden state 和 base logits。并行 drafter 的好处它保留了：draft 成本不随 block 长度线性增长。</p>
+<h4 id="heading-1">顺序阶段</h4>
+<p>采样 draft token 时，DSpark 从左到右引入轻量级 transition bias，让当前位置能依赖已经采样出的前缀 token。</p>
+<p>论文给出两种实现。</p>
+<h5 id="markov-head">Markov head</h5>
+<p>Markov head 只依赖前一个 token。它可以理解成一个低秩转移矩阵。</p>
+<p>上一个 token 是 “of” 时，它能抬高 “course” 的分数，压低 “problem”，缓解并行生成里的路径混合。</p>
+<p>这是论文默认用的方案，因为它简单、部署友好，收益又已经很明显。</p>
+<h5 id="rnn-head">RNN head</h5>
+<p>RNN head 维护一个 recurrent state，能利用更长的 block 内前缀历史，表达能力更强。但论文实验显示，它相比 Markov head 的额外收益主要出现在更长的 draft block 上，整体有限，部署却更复杂。所以生产还是用 Markov head。</p>
+<h3 id="22--token">2.2 置信度调度验证：验证“值得验证”的 token</h3>
+<p>DSpark 为每个 draft 位置预测一个置信度。</p>
+<p>它表示：在前面 token 都已被接受的条件下，第 (k) 个 draft token 能通过 target verification 的概率。</p>
+<p>一个长度为 (j) 的前缀全部存活的概率是累计乘积。</p>
+<p>调度器将所有请求的候选前缀扩展按累计存活概率排序，并结合预先 profile 得到的引擎吞吐曲线。</p>
+<p>其中 (B) 是目标模型一次验证的 token batch size，SPS 表示 steps per second。</p>
+<p>调度目标是最大化系统期望吞吐：</p>
+<p>这里 (\tau) 是期望被接受的 token 数。说白了，调度器在算一笔账：多验证这个 token 带来的期望收益，能不能盖过它占用 batch capacity 的机会成本。低负载时放宽验证长度，高负载时收紧验证预算。</p>
+<hr />
+<h2 id="3-">3. “无损”约束与因果性问题</h2>
+<p>Speculative decoding 的吸引力在于它可以保持目标模型输出分布不变。但这个性质依赖一个关键条件：调度决策不能偷看未来 token。</p>
+<p>论文称之为 <strong>non-anticipating property</strong>。如果第一个 draft token 是否被送去验证，取决于这个 token 实际采样出来是什么，那么输出分布会被选择机制污染。</p>
+<p>论文附录 A 给出反例：</p>
+<ul>
+<li>draft 第一个位置可能采样出 A 或 B；</li>
+<li>如果采到 A，后续 confidence 高，调度器决定验证；</li>
+<li>如果采到 B，后续 confidence 低，调度器决定不验证；</li>
+<li>结果 A 更容易进入最终输出，导致输出分布偏离 target model。</li>
+</ul>
+<p>因此理论算法中用 early stopping，不拿未来候选 token 的信息去影响当前的 admission decision。</p>
+<p>生产实现里情况更麻烦。DeepSeek serving 系统有 Zero-Overhead Scheduling 和 CUDA graph replay 这些约束，论文改用异步调度：用两步前的历史预测决定动态容量 (K)，当前候选 token 仍按实时 confidence 排序进入 top-K。作者认为这形成了一道因果隔离屏障，既能适配真实硬件中不平滑的吞吐曲线，也能维持目标分布的精确性。</p>
+<p>这一点最值得盯：理论调度器和生产调度器并不一样，生产版的正确性吊在“异步历史信息不泄露当前 token realization”这个前提上。</p>
+<hr />
+<h2 id="4-">4. 训练目标</h2>
+<p>DSpark 训练时冻结 target model，只训练 draft backbone、sequential head 和 confidence head，并共享目标模型的 embedding layer 与 LM head。</p>
+<p>训练目标包括三项。</p>
+<h3 id="41-">4.1 交叉熵损失</h3>
+<p>让 drafter 预测真实 token</p>
+<h3 id="42-">4.2 分布匹配损失</h3>
+<p>约束 draft distribution 接近 target distribution</p>
+<p>这项损失有直接动机：speculative decoding 的单步接受率与总变差距离相关。</p>
+<p>降低总变差距离，等价于提高预期接受率。</p>
+<h3 id="43-">4.3 置信度损失</h3>
+<p>训练 confidence head 预测 soft acceptance label</p>
+<p>三项损失按权重合并</p>
+<p>另外，论文对前面位置使用更高权重，因为 speculative decoding 接受的是连续前缀，前面的 token 更关键。</p>
+<hr />
+<h2 id="5-">5. 离线实验</h2>
+<h3 id="51-">5.1 实验设置</h3>
+<p>目标模型包括：</p>
+<ul>
+<li>Qwen3-4B</li>
+<li>Qwen3-8B</li>
+<li>Qwen3-14B</li>
+<li>Gemma4-12B</li>
+</ul>
+<p>对比 drafter：</p>
+<ul>
+<li><strong>Eagle3</strong>：自回归 drafter</li>
+<li><strong>DFlash</strong>：并行 drafter</li>
+<li><strong>DSpark</strong>：本文方法</li>
+</ul>
+<p>任务域包括：</p>
+<ul>
+<li>数学：GSM8K、MATH500、AIME25</li>
+<li>代码：MBPP、HumanEval、Live-CodeBench</li>
+<li>聊天：MT-Bench、Alpaca、Arena-Hard</li>
+</ul>
+<p>主要指标是每轮 speculative decoding 的 accepted length (\tau)，越高越好。论文说明该指标包含 target-generated bonus token。</p>
+<h3 id="52-">5.2 主要结果</h3>
+<p>论文报告，在 Qwen3-4B、8B、14B 上，DSpark 相比 Eagle3 的 macro-average accepted length 分别提升：</p>
+<ul>
+<li><strong>30.9%</strong></li>
+<li><strong>26.7%</strong></li>
+<li><strong>30.0%</strong></li>
+</ul>
+<p>相比 DFlash 分别提升：</p>
+<ul>
+<li><strong>16.3%</strong></li>
+<li><strong>18.4%</strong></li>
+<li><strong>18.3%</strong></li>
+</ul>
+<p>在 Gemma4-12B 上也有一致收益。</p>
+<p>部分结果摘录：</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Drafter</th>
+<th align="right">GSM8K</th>
+<th align="right">MATH</th>
+<th align="right">AIME25</th>
+<th align="right">MBPP</th>
+<th align="right">HumanEval</th>
+<th align="right">LCB</th>
+<th align="right">MT-Bench</th>
+<th align="right">Alpaca</th>
+<th align="right">Arena-Hard</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen3-4B</td>
+<td>Eagle3</td>
+<td align="right">5.14</td>
+<td align="right">4.62</td>
+<td align="right">3.92</td>
+<td align="right">3.69</td>
+<td align="right">4.16</td>
+<td align="right">3.77</td>
+<td align="right">2.39</td>
+<td align="right">2.26</td>
+<td align="right">2.55</td>
+</tr>
+<tr>
+<td>Qwen3-4B</td>
+<td>DFlash</td>
+<td align="right">5.40</td>
+<td align="right">4.85</td>
+<td align="right">4.15</td>
+<td align="right">4.40</td>
+<td align="right">4.74</td>
+<td align="right">4.18</td>
+<td align="right">3.07</td>
+<td align="right">2.96</td>
+<td align="right">2.83</td>
+</tr>
+<tr>
+<td>Qwen3-4B</td>
+<td>DSpark</td>
+<td align="right"><strong>6.11</strong></td>
+<td align="right"><strong>5.70</strong></td>
+<td align="right"><strong>4.89</strong></td>
+<td align="right"><strong>5.13</strong></td>
+<td align="right"><strong>5.38</strong></td>
+<td align="right"><strong>4.86</strong></td>
+<td align="right"><strong>3.64</strong></td>
+<td align="right"><strong>3.54</strong></td>
+<td align="right"><strong>3.29</strong></td>
+</tr>
+<tr>
+<td>Qwen3-8B</td>
+<td>DSpark</td>
+<td align="right"><strong>6.17</strong></td>
+<td align="right"><strong>5.78</strong></td>
+<td align="right"><strong>5.01</strong></td>
+<td align="right"><strong>5.16</strong></td>
+<td align="right"><strong>5.52</strong></td>
+<td align="right"><strong>5.17</strong></td>
+<td align="right"><strong>3.72</strong></td>
+<td align="right"><strong>3.58</strong></td>
+<td align="right"><strong>3.21</strong></td>
+</tr>
+<tr>
+<td>Qwen3-14B</td>
+<td>DSpark</td>
+<td align="right"><strong>6.21</strong></td>
+<td align="right"><strong>5.74</strong></td>
+<td align="right"><strong>4.94</strong></td>
+<td align="right"><strong>5.26</strong></td>
+<td align="right"><strong>5.43</strong></td>
+<td align="right"><strong>5.02</strong></td>
+<td align="right"><strong>3.70</strong></td>
+<td align="right"><strong>3.58</strong></td>
+<td align="right"><strong>3.13</strong></td>
+</tr>
+<tr>
+<td>Gemma4-12B</td>
+<td>DSpark</td>
+<td align="right"><strong>6.05</strong></td>
+<td align="right"><strong>5.78</strong></td>
+<td align="right"><strong>5.12</strong></td>
+<td align="right"><strong>5.11</strong></td>
+<td align="right"><strong>5.64</strong></td>
+<td align="right"><strong>4.51</strong></td>
+<td align="right"><strong>3.49</strong></td>
+<td align="right"><strong>3.35</strong></td>
+<td align="right"><strong>2.92</strong></td>
+</tr>
+</tbody>
+</table>
+<p>一个重要现象是：结构化任务的 accepted length 显著高于开放聊天。以 Qwen3-4B 上的 DSpark 为例：</p>
+<ul>
+<li>数学任务平均接受长度更高；</li>
+<li>代码任务也较高；</li>
+<li>聊天任务较低。</li>
+</ul>
+<p>这说明静态验证长度不是好选择。代码和数学可以多验，开放聊天里盲验长后缀就是在浪费目标模型容量。</p>
+<hr />
+<h2 id="6-">6. 关键分析实验</h2>
+<h3 id="61--drafter--drafter">6.1 为什么并行 drafter 能超过自回归 drafter</h3>
+<p>直觉上，自回归 drafter 应该更准，因为它能利用前缀 token。但论文发现，Eagle3 这类自回归 drafter 受顺序延迟限制，结构往往较浅；DFlash 和 DSpark 这样的并行 drafter 可以使用更深的网络。</p>
+<p>结果是：</p>
+<ul>
+<li>第一个 draft token 上，并行模型容量更强，准确率更高；</li>
+<li>speculative decoding 又极度依赖第一个 token，因为第一个 token 被拒绝会使后续草稿全部失效；</li>
+<li>因此并行模型虽然后缀衰减快，整体 accepted length 仍可能超过浅层自回归 drafter。</li>
+</ul>
+<p>DSpark 的设计恰好把两边合起来：并行 backbone 提供第一个 token 的高容量预测，轻量 sequential head 修后续 token 的条件依赖。</p>
+<h3 id="62-markov-head-">6.2 Markov head 的性价比</h3>
+<p>论文发现 2-layer DSpark 就能超过 5-layer DFlash。这说明给并行 drafter 加入局部自回归依赖，比单纯堆更深的并行层更有效。</p>
+<p>当 proposal length 增加时，DSpark 相对 DFlash 的优势变大：</p>
+<ul>
+<li>(\gamma=7)：数学 +16%，代码 +15%，聊天 +18%；</li>
+<li>(\gamma=15)：数学 +30%，代码 +26%，聊天 +22%。</li>
+</ul>
+<p>顺序采样带来的延迟开销很小。论文报告在 batch size 128 下，draft length 从 4 扩展到 16，相比 DFlash 的整轮延迟只增加 <strong>0.2% 到 1.3%</strong>，但 accepted length 最高可提升约 30%。</p>
+<h3 id="63-confidence-head-">6.3 Confidence head 与校准</h3>
+<p>论文通过 threshold sweep 证明，confidence head 能识别低价值后缀。随着 threshold 提高，验证 token 减少，但整体 acceptance rate 上升。</p>
+<p>聊天任务中，acceptance rate 从 <strong>45.7%</strong> 提升到 <strong>95.7%</strong>。数学和代码也提升：</p>
+<ul>
+<li>数学：76.9% → 92.5%</li>
+<li>代码：67.6% → 92.0%</li>
+</ul>
+<p>但 raw confidence 存在过度自信问题。论文报告其 ROC-AUC 为 <strong>0.81 到 0.90</strong>，排序能力较好，但 ECE 为 <strong>3% 到 8%</strong>。通过 Sequential Temperature Scaling 校准后，平均 ECE 降至约 <strong>1%</strong>。</p>
+<p>这个区别影响不小，因为调度器不只靠排序，还要置信度的绝对数值来估计期望吞吐。</p>
+<hr />
+<h2 id="7-">7. 生产部署结果</h2>
+<p>论文将 DSpark 部署到 DeepSeek-V4-Flash preview 和 DeepSeek-V4-Pro preview 的生产 serving 系统中，对比原生产 baseline MTP-1。生产版本使用 DSpark-5，最大 draft length (\gamma=5)。</p>
+<h3 id="71-v4-flash">7.1 V4-Flash</h3>
+<ul>
+<li>在 <strong>80 tok/s/user</strong> SLA 下，DSpark 的 aggregate throughput 比 MTP-1 高 <strong>51%</strong>。</li>
+<li>在 <strong>120 tok/s/user</strong> 严格 SLA 下，DSpark 的 nominal aggregate throughput 高 <strong>661%</strong>。</li>
+<li>在 matched practical throughput levels 下，DSpark 的 per-user generation speed 提升 <strong>60% 到 85%</strong>。</li>
+</ul>
+<h3 id="72-v4-pro">7.2 V4-Pro</h3>
+<ul>
+<li>在 <strong>35 tok/s/user</strong> SLA 下，aggregate throughput 提升 <strong>52%</strong>。</li>
+<li>在 <strong>50 tok/s/user</strong> 严格 SLA 下，nominal throughput 高 <strong>406%</strong>。</li>
+<li>在 matched system capacity 下，per-user generation speed 提升 <strong>57% 到 78%</strong>。</li>
+</ul>
+<h3 id="73-">7.3 对大数字的解释</h3>
+<p>论文自己对 661% 和 406% 的解释比较克制：这些高倍数主要来自 MTP-1 在严格 SLA 下进入低并发退化区，不能将其理解为一般场景下稳定数倍加速。</p>
+<p>更稳妥的结论是：</p>
+<ul>
+<li>中等 SLA 下，DSpark 带来约 51% / 52% aggregate throughput 提升；</li>
+<li>同等吞吐水平下，DSpark 带来 57% 到 85% 的单用户生成速度提升；</li>
+<li>严格 SLA 下，DSpark 能维持 MTP-1 几乎撑不住的交互档位。</li>
+</ul>
+<hr />
+<h2 id="8-">8. 论文贡献</h2>
+<h3 id="81-">8.1 算法结构贡献</h3>
+<p>DSpark 提出一种半自回归 drafter：并行 backbone 负责高容量快速预测，轻量 sequential head 负责补足 block 内局部依赖。它在保持 drafting 速度的同时缓解了并行生成的 suffix decay。</p>
+<h3 id="82-">8.2 调度机制贡献</h3>
+<p>论文将 verification length selection 形式化为系统吞吐优化问题，而不是固定长度或固定阈值策略。它显式考虑：</p>
+<ul>
+<li>draft token 的累计存活概率；</li>
+<li>当前 batch 中多个请求之间的资源竞争；</li>
+<li>硬件吞吐曲线 (SPS(B))。</li>
+</ul>
+<h3 id="83-">8.3 生产系统贡献</h3>
+<p>这篇论文的系统部分很重。它处理了真实部署中的几个难题：</p>
+<ul>
+<li>硬件吞吐曲线离散且不平滑；</li>
+<li>Zero-Overhead Scheduling 需要提前知道下一步 batch size；</li>
+<li>variable-length verification 会破坏标准 fixed-query-length kernel 的效率；</li>
+<li>动态调度必须保持 speculative decoding 的无损分布性质。</li>
+</ul>
+<p>这些内容让 DSpark 更像一次模型结构、训练目标、调度策略和 serving kernel 的联合优化，而不只是一个离线 accepted length 改进。</p>
+<hr />
+<h2 id="9-">9. 局限与疑点</h2>
+<h3 id="91-">9.1 外部复现难度高</h3>
+<p>论文开源了 DSpark checkpoints 和 DeepSpec，但生产结果依赖 DeepSeek 内部 serving stack、HAI-LLM、ZOS、定制 sparse attention / compress kernels 和真实用户流量。外部团队更容易复现离线 accepted length，很难复现线上吞吐边界。</p>
+<h3 id="92-">9.2 基础设施绑定强</h3>
+<p>硬件感知 scheduler 需要预先 profile 引擎吞吐曲线，并要求推理框架支持动态 verification batch。普通 vLLM、TensorRT-LLM 或自研 serving 系统要迁移完整方案，成本不会低。</p>
+<h3 id="93-fixed-draft-cost-">9.3 fixed draft cost 仍然存在</h3>
+<p>DSpark 仍要先生成完整 draft block。对于复杂、开放、低接受率请求，这部分 draft compute 可能无法回收。论文也承认，未来可以加入 difficulty-aware early exiting，让难请求提前绕过完整 draft generation。</p>
+<h3 id="94-">9.4 生产无损性需要实现级验证</h3>
+<p>理论部分对 non-anticipating property 的说明很清楚。生产部分通过两步前历史预测形成因果屏障，这个论证在概念上合理，但外部读者无法直接审计实现细节。对于无损采样系统，任何 admission decision 的因果边界都很敏感。</p>
+<h3 id="95--sla-">9.5 严格 SLA 提升数字容易被误用</h3>
+<p>661% / 406% 不是常规稳定加速倍数，而是 baseline 在严格 SLA 下退化后形成的相对优势。引用这两个数字时必须附带解释，否则容易夸大论文结论。</p>
+<hr />
+<h2 id="10-">10. 与相关路线的关系</h2>
+<p>DSpark 位于 speculative decoding 的系统化方向上。它和以下路线相关：</p>
+<ul>
+<li>multi-token prediction / MTP；</li>
+<li>Medusa、Eagle、DFlash 等 drafter 结构；</li>
+<li>rejection sampling 保持目标分布的 speculative decoding；</li>
+<li>serving 系统中的 goodput / latency / batch capacity 调度。</li>
+</ul>
+<p>它的核心变化是把问题从单请求层面的“能多猜几个 token”转为系统层面的“哪些 token 值得消耗目标模型 batch capacity 去验证”。</p>
+<p>这对生产推理系统很关键，因为线上瓶颈常常不是 draft model 能不能提出候选，而是目标模型验证预算在高并发下是否被浪费。</p>
+<hr />
+<h2 id="11--1">11. 个人判断</h2>
+<p>这是一篇工程价值很高、系统意识很强的 speculative decoding 论文。</p>
+<p>它最值钱的不是某个单独公式，而是三件事咖到一起：</p>
+<ol>
+<li>用半自回归 head 修并行草稿的后缀崩塌；</li>
+<li>用 confidence 和 calibration 把“会不会被接受”变成可调度信号；</li>
+<li>用硬件吞吐曲线和实时负载决定验证预算。</li>
+</ol>
+<p>如果关心的是怎么让大模型服务真正更快，这篇比很多只报离线 accepted length 的论文更值得读。它直接碰了高并发生产场景里的批容量竞争、SLA 约束和动态调度。</p>
+<p>但它不是一个能即插即用的通用技巧。DSpark 很大程度上是 DeepSeek 对自家生产 serving 栈的一次深度联合优化。外部团队借鉴时，最该先吸收的是一个前提：speculative decoding 的瓶颈不只是 draft 准不准，还包括验证预算在全局 batch capacity 中划不划算。</p>
+<hr />
+<h2 id="12--1">12. 后续可追的问题</h2>
+<ol>
+<li>DSpark 在 vLLM / TensorRT-LLM 等公开 serving 框架中能否保持类似收益？</li>
+<li>两步前历史预测形成的 causal barrier，是否有形式化证明或更细粒度实现审计？</li>
+<li>对低接受率请求，difficulty-aware early exit 能减少多少固定 draft cost？</li>
+<li>Markov head 对不同语言、代码、数学符号序列的迁移能力是否一致？</li>
+<li>如果目标模型进入 thinking mode，draft acceptance 和 confidence calibration 会如何变化？</li>
+<li>DSpark 与 tree-based speculative decoding 是否能结合，还是系统复杂度会抵消收益？</li>
+</ol>
+<hr />
+<h2 id="13-">13. 可引用结论</h2>
+<ul>
+<li>DSpark 的本质是把 speculative decoding 从“每个请求尽量多猜”改成“全系统只验证期望收益为正的草稿前缀”。</li>
+<li>半自回归 head 用很小的顺序成本换来了显著的后缀一致性收益。</li>
+<li>生产环境中的 speculative decoding 是调度问题，不只是模型结构问题。</li>
+<li>严格 SLA 下的 661% / 406% 应理解为交互档位扩展，而非一般场景稳定数倍加速。</li>
+<li>对外复现时，离线 accepted length 较容易验证，线上 Pareto frontier 依赖 DeepSeek 内部 serving 栈，复现难度高。</li>
+</ul>
+
+            </div>
+
+</article>
+
+
+
+
+
+
+<div class="mod-post__poster">
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Reading Progress Component -->
+<div class="reading-progress-container">
+  <span class="reading-label">阅读进度</span>
+  <span class="reading-value">0%</span>
+  <svg class="progress-ring" viewBox="0 0 24 24">
+    <!-- Background Circle -->
+    <circle class="progress-ring__circle-bg" stroke-width="3" fill="transparent" r="10" cx="12" cy="12" />
+    <!-- Progress Circle -->
+    <circle class="progress-ring__circle" stroke-width="3" fill="transparent" r="10" cx="12" cy="12" />
+  </svg>
+</div>
+<footer id="footer" class="footer">
+    <nav>
+        
+        
+        <a class="menu-item" href="/">首页</a>
+        
+         · 
+        <a class="menu-item" href="/post">博客</a>
+        
+         · 
+        <a class="menu-item" href="/archives">归档</a>
+        
+         · 
+        <a class="menu-item" href="/tags">标签</a>
+        
+         · 
+        <a class="menu-item" href="/post/friends">友链</a>
+        
+         · 
+        <a class="menu-item" href="/post/about">关于</a>
+        
+    </nav>
+
+    <div class="Copyright">Copyright &copy; <span class="current-year"></span> <a href="https://gkd2323c.in">gkd2323c</a></div>
+    <script>document.querySelector('.current-year').textContent = new Date().getFullYear();</script>
+
+    <div class="index_footer">
+        Powered by gkd2323c
+ ·
+        <a class="rss" href="/feed.xml" target="_blank" rel="noopener noreferrer">
+            <i class="ri-rss-line"></i>RSS
+        </a>
+    </div>
+</footer>
+
+
+
+
+    
+
+    
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: amore-jinja2 v1.1.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>
