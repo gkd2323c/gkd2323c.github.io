@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+<meta name="viewport"
+    content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, width=device-width" />
+<meta name="renderer" content="webkit">
+<meta name="format-detection" content="telephone=no, email=no, address=no">
+
+
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#292a2d" media="(prefers-color-scheme: dark)">
+
+
+<link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/gkd2323c/blog_cdn@main/images/theme/appicon.png">
+<link rel="stylesheet" href="/styles/main.min.css">
+
+
+<style>:root{--accent-color:#28df99;}</style>
+
+
+<script>
+    // 自动为所有 target="_blank" 的链接添加 rel="noopener noreferrer"
+    document.addEventListener('DOMContentLoaded', function () {
+        var links = document.querySelectorAll('a[target="_blank"]');
+        links.forEach(function (link) {
+            var rel = link.getAttribute('rel') || '';
+            if (rel.indexOf('noopener') === -1) {
+                rel += ' noopener';
+            }
+            if (rel.indexOf('noreferrer') === -1) {
+                rel += ' noreferrer';
+            }
+            link.setAttribute('rel', rel.trim());
+        });
+    });
+</script>
+
+<script>
+    // declaraction of document.ready() function.
+    (function () {
+        var ie = !!(window.attachEvent && !window.opera);
+        var wk = /webkit\/(\d+)/i.test(navigator.userAgent) && (RegExp.$1 < 525);
+        var fn = [];
+        var run = function () {
+            for (var i = 0; i < fn.length; i++) fn[i]();
+        };
+        var d = document;
+        d.ready = function (f) {
+            if (!ie && !wk && d.addEventListener)
+                return d.addEventListener('DOMContentLoaded', f, false);
+            if (fn.push(f) > 1) return;
+            if (ie)
+                (function () {
+                    try {
+                        d.documentElement.doScroll('left');
+                        run();
+                    } catch (err) {
+                        setTimeout(arguments.callee, 0);
+                    }
+                })();
+            else if (wk)
+                var t = setInterval(function () {
+                    if (/^(loaded|complete)$/.test(d.readyState))
+                        clearInterval(t), run();
+                }, 0);
+        };
+    })();
+
+
+    document.ready(
+        function () {
+            var _Blog = window._Blog || {};
+
+            const getSystemTheme = () => {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    return 'dark';
+                }
+                return 'light';
+            };
+
+            const configDefault = 'dark';
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme');
+            const initialTheme = currentTheme || configDefault || getSystemTheme();
+            const isDark = initialTheme === 'dark';
+
+            const updateButtons = (dark) => {
+                const sunBtn = document.getElementById("theme-toggle-sun");
+                const moonBtn = document.getElementById("theme-toggle-moon");
+                const mobileSunBtn = document.getElementById("mobile-theme-toggle-sun");
+                const mobileMoonBtn = document.getElementById("mobile-theme-toggle-moon");
+
+                if (dark) {
+                    if (sunBtn) sunBtn.style.display = 'none';
+                    if (moonBtn) moonBtn.style.display = 'inline-block';
+                    if (mobileSunBtn) mobileSunBtn.style.display = 'none';
+                    if (mobileMoonBtn) mobileMoonBtn.style.display = 'inline-block';
+                } else {
+                    if (sunBtn) sunBtn.style.display = 'inline-block';
+                    if (moonBtn) moonBtn.style.display = 'none';
+                    if (mobileSunBtn) mobileSunBtn.style.display = 'inline-block';
+                    if (mobileMoonBtn) mobileMoonBtn.style.display = 'none';
+                }
+            };
+
+            const updateThemeColor = (dark) => {
+                const themeColor = dark ? '#292a2d' : '#ffffff';
+                const metaTags = document.querySelectorAll('meta[name="theme-color"]');
+                if (metaTags.length > 0) {
+                    // 保留第一个，移除其他的，避免重复
+                    for (let i = 1; i < metaTags.length; i++) {
+                        metaTags[i].remove();
+                    }
+                    metaTags[0].setAttribute('content', themeColor);
+                    metaTags[0].removeAttribute('media');
+                } else {
+                    const meta = document.createElement('meta');
+                    meta.name = 'theme-color';
+                    meta.content = themeColor;
+                    document.head.appendChild(meta);
+                }
+            };
+
+            const applyTheme = (dark) => {
+                const body = document.getElementsByTagName('body')[0];
+                if (dark) {
+                    body.classList.add('dark-theme');
+                } else {
+                    body.classList.remove('dark-theme');
+                }
+                updateButtons(dark);
+                updateThemeColor(dark);
+            };
+
+            // Initial application
+            applyTheme(isDark);
+            if (!currentTheme) {
+                window.localStorage && window.localStorage.setItem('theme', initialTheme);
+            }
+
+            _Blog.toggleTheme = function () {
+                const toggleFunc = (e) => {
+                    // Prevent bubbling if needed, though buttons are distinct now
+                    if (e) e.stopPropagation();
+
+                    const body = document.getElementsByTagName('body')[0];
+                    const isCurrentlyDark = body.classList.contains('dark-theme');
+
+                    if (isCurrentlyDark) {
+                        body.classList.remove('dark-theme');
+                        updateButtons(false);
+                        window.localStorage && window.localStorage.setItem('theme', 'light');
+                    } else {
+                        body.classList.add('dark-theme');
+                        updateButtons(true);
+                        window.localStorage && window.localStorage.setItem('theme', 'dark');
+                    }
+                };
+
+                const sunBtn = document.getElementById("theme-toggle-sun");
+                const moonBtn = document.getElementById("theme-toggle-moon");
+                const mobileSunBtn = document.getElementById("mobile-theme-toggle-sun");
+                const mobileMoonBtn = document.getElementById("mobile-theme-toggle-moon");
+
+                if (sunBtn) sunBtn.addEventListener('click', toggleFunc);
+                if (moonBtn) moonBtn.addEventListener('click', toggleFunc);
+                if (mobileSunBtn) mobileSunBtn.addEventListener('click', toggleFunc);
+                if (mobileMoonBtn) mobileMoonBtn.addEventListener('click', toggleFunc);
+            };
+            _Blog.toggleTheme();
+
+            if (window.matchMedia && !configDefault) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                    const newTheme = e.matches ? 'dark' : 'light';
+                    applyTheme(e.matches);
+                    window.localStorage && window.localStorage.setItem('theme', newTheme);
+                });
+            }
+        }
+    );
+</script>
+
+<script>
+    // Reading Progress Component
+    document.addEventListener('DOMContentLoaded', () => {
+        const progressValue = document.querySelector('.reading-value');
+        const progressCircle = document.querySelector('.progress-ring__circle');
+        const container = document.querySelector('.reading-progress-container');
+
+        // Exit if elements don't exist (e.g., not on a post page)
+        if (!progressValue || !progressCircle || !container) {
+            return;
+        }
+
+        // SVG Circle setup
+        const radius = progressCircle.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
+
+        progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+        progressCircle.style.strokeDashoffset = circumference;
+
+        function setProgress(percent) {
+            const safePercent = Math.min(100, Math.max(0, percent));
+            progressValue.textContent = `${Math.round(safePercent)}%`;
+            const offset = circumference - (safePercent / 100) * circumference;
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        function onScroll() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+
+            if (scrollHeight <= 0) {
+                setProgress(0);
+                return;
+            }
+
+            const scrollPercent = (scrollTop / scrollHeight) * 100;
+            setProgress(scrollPercent);
+
+            // Show/Hide logic: Show if scrolled more than 100px
+            if (scrollTop > 100) {
+                container.classList.add('show');
+            } else {
+                container.classList.remove('show');
+            }
+        }
+
+        // Initialize
+        onScroll();
+
+        // Listen for scroll events
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // Recalculate on resize
+        window.addEventListener('resize', onScroll);
+    });
+</script>
+
+
+
+
+
+
+
+    <meta name="generator" content="Gridea Pro 1.2.2">
+    <title>认知动力学：一种用于通用人工智能的动力系统框架 | gkd2323c</title>
+
+    
+<meta name="description" content="摘要 大型语言模型（LLM，Large Language Model）已表现出出色的语言能力，但在长期推理、自主决策和可靠性方面存在固有挑战，如幻觉产生和短视行为。本文主张：这些缺陷不能只被理解为数据不足、对齐不足或工具调用不足，而应被理解为动力学缺陷。 核心命题如下： 智能不是一个函数逼近问题。 智能是一个持续演化的动力系统。 据此，我们提出 **&amp;hellip;">
+<link rel="canonical" href="https://gkd2323c.in/post/ren-zhi-dong-li-xueyi-zhong-yong-yu-tong-yong-ren-gong-zhi-neng-de-dong-li-xi-tong-kuang-jia/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"认知动力学：一种用于通用人工智能的动力系统框架","url":"https://gkd2323c.in/post/ren-zhi-dong-li-xueyi-zhong-yong-yu-tong-yong-ren-gong-zhi-neng-de-dong-li-xi-tong-kuang-jia/","description":"摘要 大型语言模型（LLM，Large Language Model）已表现出出色的语言能力，但在长期推理、自主决策和可靠性方面存在固有挑战，如幻觉产生和短视行为。本文主张：这些缺陷不能只被理解为数据不足、对齐不足或工具调用不足，而应被理解为动力学缺陷。 核心命题如下： 智能不是一个函数逼近问题。 智能是一个持续演化的动力系统。 据此，我们提出 **\u0026hellip;","datePublished":"2026-07-10T06:26:49+08:00","dateModified":"2026-07-09T22:35:42+08:00","author":{"@type":"Person","name":"gkd2323c"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/images/avatar.png"},"name":"gkd2323c"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://gkd2323c.in","name":"gkd2323c","position":1},{"@type":"ListItem","item":"https://gkd2323c.in/post/ren-zhi-dong-li-xueyi-zhong-yong-yu-tong-yong-ren-gong-zhi-neng-de-dong-li-xi-tong-kuang-jia/","name":"认知动力学：一种用于通用人工智能的动力系统框架","position":2}]}</script>
+<meta property="og:title" content="认知动力学：一种用于通用人工智能的动力系统框架">
+<meta property="og:description" content="摘要 大型语言模型（LLM，Large Language Model）已表现出出色的语言能力，但在长期推理、自主决策和可靠性方面存在固有挑战，如幻觉产生和短视行为。本文主张：这些缺陷不能只被理解为数据不足、对齐不足或工具调用不足，而应被理解为动力学缺陷。 核心命题如下： 智能不是一个函数逼近问题。 智能是一个持续演化的动力系统。 据此，我们提出 **&amp;hellip;">
+<meta property="og:url" content="https://gkd2323c.in/post/ren-zhi-dong-li-xueyi-zhong-yong-yu-tong-yong-ren-gong-zhi-neng-de-dong-li-xi-tong-kuang-jia/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="gkd2323c">
+<meta property="og:image" content="/images/avatar.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://gkd2323c.in/post/ren-zhi-dong-li-xueyi-zhong-yong-yu-tong-yong-ren-gong-zhi-neng-de-dong-li-xi-tong-kuang-jia/">
+<meta name="twitter:title" content="认知动力学：一种用于通用人工智能的动力系统框架">
+<meta name="twitter:description" content="摘要 大型语言模型（LLM，Large Language Model）已表现出出色的语言能力，但在长期推理、自主决策和可靠性方面存在固有挑战，如幻觉产生和短视行为。本文主张：这些缺陷不能只被理解为数据不足、对齐不足或工具调用不足，而应被理解为动力学缺陷。 核心命题如下： 智能不是一个函数逼近问题。 智能是一个持续演化的动力系统。 据此，我们提出 **&amp;hellip;">
+<meta name="twitter:image" content="/images/avatar.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.47/dist/katex.min.css" crossorigin="anonymous">
+</head>
+
+<body class="">
+
+    
+<script>
+    (function () {
+        const getSystemTheme = () => {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                return 'dark';
+            }
+            return 'light';
+        };
+
+        const configDefault = 'dark';
+        const savedTheme = localStorage.getItem('theme');
+        const theme = savedTheme || configDefault || getSystemTheme();
+
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+
+        if (!savedTheme) {
+            localStorage.setItem('theme', theme);
+        }
+    })();
+</script>
+<header class="mod-head">
+    <div class="mod-head__left">
+        <div class="mod-head__logo">
+            <a href="/">
+                
+                <img class="avatar" alt="avatar" src="https://cdn.jsdelivr.net/gh/gkd2323c/blog_cdn@main/images/theme/appicon.png">
+                
+            </a>
+        </div>
+    </div>
+
+    <div class="mod-head__right">
+        <span>
+            <button id="theme-toggle-sun" class="tiptap-button theme-toggle-sun" aria-label="Switch to dark mode">
+                <svg width="18" height="18" class="tiptap-button-icon" viewBox="0 0 24 24" fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 1C12.5523 1 13 1.44772 13 2V4C13 4.55228 12.5523 5 12 5C11.4477 5 11 4.55228 11 4V2C11 1.44772 11.4477 1 12 1Z"
+                        fill="currentColor"></path>
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M13 20C13 19.4477 12.5523 19 12 19C11.4477 19 11 19.4477 11 20V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V20Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M4.22282 4.22289C4.61335 3.83236 5.24651 3.83236 5.63704 4.22289L7.04704 5.63289C7.43756 6.02341 7.43756 6.65658 7.04704 7.0471C6.65651 7.43762 6.02335 7.43762 5.63283 7.0471L4.22282 5.6371C3.8323 5.24658 3.8323 4.61341 4.22282 4.22289Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M18.367 16.9529C17.9765 16.5623 17.3433 16.5623 16.9528 16.9529C16.5623 17.3434 16.5623 17.9766 16.9528 18.3671L18.3628 19.7771C18.7533 20.1676 19.3865 20.1676 19.777 19.7771C20.1675 19.3866 20.1675 18.7534 19.777 18.3629L18.367 16.9529Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M1 12C1 11.4477 1.44772 11 2 11H4C4.55228 11 5 11.4477 5 12C5 12.5523 4.55228 13 4 13H2C1.44772 13 1 12.5523 1 12Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M20 11C19.4477 11 19 11.4477 19 12C19 12.5523 19.4477 13 20 13H22C22.5523 13 23 12.5523 23 12C23 11.4477 22.5523 11 22 11H20Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M7.04704 16.9529C7.43756 17.3434 7.43756 17.9766 7.04704 18.3671L5.63704 19.7771C5.24651 20.1676 4.61335 20.1676 4.22282 19.7771C3.8323 19.3866 3.8323 18.7534 4.22283 18.3629L5.63283 16.9529C6.02335 16.5623 6.65651 16.5623 7.04704 16.9529Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M19.777 5.6371C20.1675 5.24657 20.1675 4.61341 19.777 4.22289C19.3865 3.83236 18.7533 3.83236 18.3628 4.22289L16.9528 5.63289C16.5623 6.02341 16.5623 6.65658 16.9528 7.0471C17.3433 7.43762 17.9765 7.43762 18.367 7.0471L19.777 5.6371Z"
+                        fill="currentColor"></path>
+                </svg>
+            </button>
+            <button id="theme-toggle-moon" class="tiptap-button theme-toggle-moon" aria-label="Switch to light mode">
+                <svg width="18" height="18" class="tiptap-button-icon" viewBox="0 0 24 24" fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 11.5955 21.7564 11.2309 21.3827 11.0761C21.009 10.9213 20.5789 11.0069 20.2929 11.2929C19.287 12.2988 17.9226 12.864 16.5 12.864C15.0774 12.864 13.713 12.2988 12.7071 11.2929C11.7012 10.287 11.136 8.92261 11.136 7.5C11.136 6.07739 11.7012 4.71304 12.7071 3.70711C12.9931 3.42111 13.0787 2.99099 12.9239 2.61732C12.7691 2.24364 12.4045 2 12 2ZM7.55544 5.34824C8.27036 4.87055 9.05353 4.51389 9.87357 4.28778C9.39271 5.27979 9.13604 6.37666 9.13604 7.5C9.13604 9.45304 9.91189 11.3261 11.2929 12.7071C12.6739 14.0881 14.547 14.864 16.5 14.864C17.6233 14.864 18.7202 14.6073 19.7122 14.1264C19.4861 14.9465 19.1295 15.7296 18.6518 16.4446C17.7727 17.7602 16.5233 18.7855 15.0615 19.391C13.5997 19.9965 11.9911 20.155 10.4393 19.8463C8.88743 19.5376 7.46197 18.7757 6.34315 17.6569C5.21447 16.538 4.4624 15.1126 4.15372 13.5607C3.84504 12.0089 4.00347 10.4003 4.60897 8.93853C5.21447 7.47672 6.23985 6.22729 7.55544 5.34824Z"
+                        fill="currentColor"></path>
+                    <path
+                        d="M19 2C19.5523 2 20 2.44772 20 3V4H21C21.5523 4 22 4.44772 22 5C22 5.55228 21.5523 6 21 6H20V7C20 7.55228 19.5523 8 19 8C18.4477 8 18 7.55228 18 7V6H17C16.4477 6 16 5.55228 16 5C16 4.44772 16.4477 4 17 4H18V3C18 2.44772 18.4477 2 19 2Z"
+                        fill="currentColor"></path>
+                </svg>
+            </button>
+        </span>
+    </div>
+</header>
+<!-- <a href="#" id="back-to-top" style="display: inline;"> ^ </a> -->
+
+<article class="mod-post mod-post__type-post">
+    <header>
+        <h1 class="mod-post__title">
+            认知动力学：一种用于通用人工智能的动力系统框架
+        </h1>
+    </header>
+
+    <div class="mod-post__meta">
+        <time datetime="2026-07-10">
+            2026-07-10
+        </time> • 37 分钟阅读 •
+         </div>
+
+
+
+            <div class="mod-post__entry wzulli">
+                
+                <h2 id="heading">摘要</h2>
+<p>大型语言模型（LLM，Large Language Model）已表现出出色的语言能力，但在长期推理、自主决策和可靠性方面存在固有挑战，如幻觉产生和短视行为。本文主张：这些缺陷不能只被理解为数据不足、对齐不足或工具调用不足，而应被理解为<strong>动力学缺陷</strong>。</p>
+<p>核心命题如下：</p>
+<blockquote>
+<p>智能不是一个函数逼近问题。<br />
+智能是一个持续演化的动力系统。</p>
+</blockquote>
+<p>据此，我们提出 <strong>Cognitive Dynamics（认知动力学）</strong> 框架：把智能体视为持续演化的认知动力系统，语言只是其外显行为，而不是智能本身。为迈向类人强 AI（Artificial Intelligence，人工智能），需要引入新的认知体系结构和训练范式：包括统一认知状态对象、多模块协同（世界模型、记忆、计划、执行、元控制等）、连续反馈与离散反馈并存的控制环路，以及新的目标函数和训练流程。</p>
+<p>我们提出将训练目标从仅最小化交叉熵扩展为关于整个状态轨迹的泛函（例如带有稳定性、可塑性、信息守恒等约束的拉格朗日积分），并在训练中引入超长上下文、经验回放和多时间尺度学习等机制来模拟“长期生命”。此外，可通过引入<strong>形式化约束</strong>（如网络结构拓扑不变量、对称性、Lyapunov 李雅普诺夫约束等）或高度优先级的符号惩罚来保证动力学性质。我们比较了<strong>隐式共享架构</strong>（大模型内部多语义空间/门控）与<strong>显式微服务架构</strong>（模块化代理协同）的优缺点，并提出了评价<strong>吸引子稳定性</strong>、<strong>可塑性</strong>、<strong>幻觉率</strong>、<strong>恢复力</strong>等指标的方法。</p>
+<p>本文还分析了实现上述愿景的工程挑战和风险：如计算资源、训练难度、AI 自主驱动的安全问题和伦理可控性。最后给出从 Stage 0 到 Stage 6（第 0 至第 6 阶段）的实验路线图，强调应先开展中等规模的模拟实验（例如混合世界模型与 LLM 的长期训练）来探索这些新范式。我们的目标是为研究者和工程师提供一份系统的参考，以推动具备<strong>连续生命轨迹</strong>的认知型 AI 系统设计与评估。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gkd2323c/blog_cdn@main/post-images/1783607378474838300_0.png" alt="" /></p>
+<p><em>图 1（Figure 1. Evolution of AI，人工智能演化）：从静态函数逼近到可长期演化的认知动力系统。</em></p>
+<hr />
+<h1 id="-">第一部分 基础</h1>
+<h2 id="1--llm--cognitive-dynamics">1 从 LLM 到 Cognitive Dynamics（认知动力学）</h2>
+<p>大型语言模型通过海量语料预训练，取得了惊人的语言生成能力，但它们依然存在一些根本性的<strong>动力学缺陷</strong>。一方面，LLM 的输出通常仅依赖于最近上下文和浅层优化目标（如逐词交叉熵），缺乏<strong>长期一致性</strong>和<strong>自我监督反馈</strong>。这种“短视”训练导致模型容易产生幻觉（生成不实信息），对新任务适应时也常出现灾难性遗忘。另一方面，纯粹的神经网络缺乏像人类那样的反思和规划能力，即使强大的 LLM 在推理任务中也仅是模拟训练数据中的推理步骤，缺乏真正的<strong>规则推理</strong>和<strong>自主决策</strong>能力。这些不足促使研究者探索将神经学习与符号控制结合的<strong>神经符号</strong>方法，希望同时利用神经网络的统计学习能力和符号系统的逻辑推理优势。例如，有人指出在人脑中系统 1（快速直觉）和系统 2（慢速推理）的二元结构与神经符号融合范式相符。</p>
+<p>此外，<strong>认知科学和控制理论</strong>启示我们，人类具有多层次的时间尺度和自我调节机制。在人类认知模型中，低层感知快速响应，高层计划和元认知作用在更长时间尺度上；而元认知层监管和调整执行层。这种层级控制结构使人类能在动态复杂的环境中保持目标导向和稳定。相比之下，目前的 LLM 系统通常缺乏显式的“元认知”环节，训练过程也缺少与环境持续交互的<strong>预测－行动闭环</strong>。活跃推理（active inference）理论认为智能体应持续调整内部模型以最小化预测误差，并通过行动改变环境以验证和纠正预期。然而，当前 LLM 训练缺乏这一闭环，因此被视为被动预测者。</p>
+<p>因此，从 LLM 到 Cognitive Dynamics（认知动力学）的跃迁，不是简单“再加一层 agent wrapper（智能体外包装层）”，而是把研究对象从：</p>
+<ul>
+<li><strong>映射</strong>：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>:</mo><mtext>prompt</mtext><mo>↦</mo><mtext>response</mtext></mrow><annotation encoding="application/x-tex">f: \text{prompt} \mapsto \text{response}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8095em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">prompt</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">↦</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">response</span></span></span></span></span>（提示词映射到回答）</li>
+</ul>
+<p>转向：</p>
+<ul>
+<li><strong>轨迹</strong>：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">X(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0785em;">X</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> 在观察、行动、记忆、目标与自我模型共同作用下的连续演化。</li>
+</ul>
+<p>基于以上动机，本报告探讨一种新的认知架构和训练理念：通过增加连续反馈通路、混合显式与隐式模块，以及用一个涉及整个生命轨迹的泛函作为训练目标，来赋予 AI 系统<strong>长期稳定性</strong>和<strong>自适应能力</strong>。我们将讨论这些概念在工程实现中的权衡、具体数学形式和评测方案，并提出后续研究路线图。</p>
+<h2 id="2-">2 中心假设</h2>
+<p>本报告采用如下中心假设：</p>
+<blockquote>
+<p><strong>H1（动力学优先）</strong>：智能的本质是认知状态在时间上的稳定演化能力，而不是单次输出的表面正确性。<br />
+<strong>H2（轨迹目标）</strong>：有效训练应优化整条认知轨迹 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">X(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0785em;">X</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> 的泛函 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>J</mi><mo stretchy="false">[</mo><mi>X</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">J[X]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0962em;">J</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0785em;">X</span><span class="mclose">]</span></span></span></span>，而不仅是 token（词元/标记）级交叉熵。<br />
+<strong>H3（双反馈）</strong>：长期智能需要连续（潜变量）反馈与离散（符号）反馈并存：前者塑形动力学，后者保证可审计语义。<br />
+<strong>H4（稳定可塑性）</strong>：真正的智能同时需要稳定性（抗扰动、抗遗忘）与可塑性（可学习、可重组织），二者必须被共同约束。<br />
+<strong>H5（结构基因）</strong>：关键动力学性质应尽量写进结构与硬约束，而不是完全依赖事后 loss（损失函数）劝说。</p>
+</blockquote>
+<p>这五条假设把后文的数学对象、架构、训练与评测统一起来。若某项改动不能改变 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">X(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0785em;">X</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> 的长期行为，它就只是表层补丁，而不是 Cognitive Dynamics（认知动力学）层面的进展。</p>
+<h2 id="3--agent">3 为什么 Agent（智能体）不是终点</h2>
+<p>当前主流路径常把“Agent（智能体）”当作 LLM 之后的自然终点：工具调用、多步规划、记忆插件、多智能体协作。这些工作很重要，但它们多数仍停留在<strong>外环编排</strong>，底层动力学依然是短视预测器。</p>
+<p>Agent（智能体）路线的贡献与局限可以这样看：</p>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>典型能力</th>
+<th>已解决什么</th>
+<th>仍未解决什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLM（大语言模型）</td>
+<td>语言生成、模式补全</td>
+<td>局部语义流畅</td>
+<td>长期一致性、状态稳定性</td>
+</tr>
+<tr>
+<td>Agent（智能体）</td>
+<td>工具、规划、工作流</td>
+<td>任务分解与外部行动</td>
+<td>内部状态是否真的在演化</td>
+</tr>
+<tr>
+<td>Multi-Agent（多智能体）</td>
+<td>分工协作</td>
+<td>并行与专业化</td>
+<td>协调开销、共同真相、反馈稳定</td>
+</tr>
+<tr>
+<td>Cognitive Dynamics（认知动力学）</td>
+<td>状态、轨迹、吸引子、元控制</td>
+<td>把智能写成可约束动力系统</td>
+<td>数学可计算性与实验验证</td>
+</tr>
+</tbody>
+</table>
+<p>换言之：</p>
+<ul>
+<li>Agent（智能体）回答的是“如何调用能力完成任务”；</li>
+<li>Cognitive Dynamics（认知动力学）回答的是“这些能力在时间中如何形成稳定、可修正、可迁移的认知结构”。</li>
+</ul>
+<p>因此，Agent（智能体）是必要过渡，但不是终点。没有统一状态、轨迹目标与动力学评测，Agent 系统很容易变成更复杂的提示工程。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gkd2323c/blog_cdn@main/post-images/1783607469231459300_0.png" alt="" /><br />
+<em>图 1 补充：Agent（智能体）是中途站，不是终局。</em></p>
+<hr />
+<h1 id="--1">第二部分 统一数学框架</h1>
+<h2 id="4-">4 统一认知状态与动力学方程</h2>
+<h3 id="41-">4.1 基本对象</h3>
+<p>为避免“模块很多、变量不清”，我们先定义统一数学对象。设智能体在时刻 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span> 的认知状态为：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>其中：</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>名称</th>
+<th>含义</th>
+<th>工程近似</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">B(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span></td>
+<td>Belief（信念）</td>
+<td>当前信念 / 工作假设</td>
+<td>隐状态摘要、置信分布、检索结果加权</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">W(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span></td>
+<td>World Model（世界模型）</td>
+<td>对外部世界的预测模型</td>
+<td>动力学预测器、环境模拟器、因果图</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">S(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span></td>
+<td>Self Model（自我模型）</td>
+<td>对自身能力、边界、历史的估计</td>
+<td>置信校准、能力卡、失败记录</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">G(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">G</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span></td>
+<td>Goal（目标）</td>
+<td>目标与约束优先级</td>
+<td>任务目标、安全约束、长期偏好</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">M(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span></td>
+<td>Memory（记忆）</td>
+<td>可读写长期记忆</td>
+<td>向量库、事件日志、巩固后的摘要</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span></td>
+<td>Observation（观察）</td>
+<td>外部观察</td>
+<td>用户输入、工具返回、传感器信号</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">A(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span></td>
+<td>Action（行动）</td>
+<td>对外行动</td>
+<td>回答、工具调用、环境操作</td>
+</tr>
+</tbody>
+</table>
+<p>这些对象不必一开始就物理分家；它们可以先作为同一网络中的语义子空间，再逐步显式化。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gkd2323c/blog_cdn@main/post-images/1783607502768591700_0.png" alt="" /></p>
+<p><em>图 2（Figure 2. Cognitive State Space，认知状态空间）：智能被写成状态空间中的轨迹，而不是单次输入输出映射。</em></p>
+<h3 id="42-">4.2 统一动力学</h3>
+<p>系统演化写成：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>离散时间版本：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span></span></span></span> 为可学习参数。<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi></mrow><annotation encoding="application/x-tex">F</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span></span></span></span> 不是“下一个 token（词元）的 logits（未归一化预测分数）”本身，而是包含：</p>
+<ol>
+<li>信念更新：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>B</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>←</mo><msub><mi>U</mi><mi>B</mi></msub><mo stretchy="false">(</mo><msub><mi>B</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>O</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>W</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">B_{t+1} \leftarrow U_B(B_t, O_t, W_t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></li>
+<li>世界模型更新：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>←</mo><msub><mi>U</mi><mi>W</mi></msub><mo stretchy="false">(</mo><msub><mi>W</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>O</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>A</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">W_{t+1} \leftarrow U_W(W_t, O_t, A_t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">W</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></li>
+<li>自我模型更新：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>←</mo><msub><mi>U</mi><mi>S</mi></msub><mo stretchy="false">(</mo><msub><mi>S</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mtext>error</mtext><mi>t</mi></msub><mo separator="true">,</mo><msub><mtext>resource</mtext><mi>t</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">S_{t+1} \leftarrow U_S(S_t, \text{error}_t, \text{resource}_t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0576em;">S</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord text"><span class="mord">error</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord text"><span class="mord">resource</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>（error 为误差，resource 为资源状态）</li>
+<li>目标重权：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>←</mo><msub><mi>U</mi><mi>G</mi></msub><mo stretchy="false">(</mo><msub><mi>G</mi><mi>t</mi></msub><mo separator="true">,</mo><mtext>constraint</mtext><mo separator="true">,</mo><mtext>meta</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">G_{t+1} \leftarrow U_G(G_t, \text{constraint}, \text{meta})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">G</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">constraint</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">meta</span></span><span class="mclose">)</span></span></span></span>（constraint 为约束，meta 为元控制信号）</li>
+<li>记忆写入/巩固：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>M</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>←</mo><msub><mi>U</mi><mi>M</mi></msub><mo stretchy="false">(</mo><msub><mi>M</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>B</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mtext>salience</mtext><mi>t</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">M_{t+1} \leftarrow U_M(M_t, B_t, \text{salience}_t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">M</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord text"><span class="mord">salience</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>（salience 为显著性/重要度）</li>
+</ol>
+<p>语言生成只是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">A(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> 的一种投影：</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex"></annotation></semantics></math></span><span class="katex-html" aria-hidden="true"></span></span></span><p>其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext>tokens</mtext><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">\text{tokens}_t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">tokens</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 表示第 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span> 步生成的词元序列，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal">Π</mi><mtext>lang</mtext></msub></mrow><annotation encoding="application/x-tex">\Pi_{\text{lang}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord">Π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">lang</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 是从认知状态到语言输出的投影。</p>
+<h3 id="43-">4.3 轨迹泛函：从局部交叉熵到整条生命轨迹</h3>
+<p>传统 LLM 训练以<strong>最小化交叉熵</strong>为目标，即通过最大化下一个标记的对数似然来驱动参数更新。这是一种点对点的局部目标，只关注单步预测准确性。但在长期、动态任务中，我们需要优化的不再是单步损失的和，而是整个系统<strong>演化轨迹</strong>上的整体性能。</p>
+<p>为此，将训练目标改写为轨迹泛函：</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Can&#x27;t use function &#x27;$&#x27; in math mode at position 217: …
+\Big)
+
+
+- $̲S_{\text{stable…" style="color:#cc0000">\mathcal{L}_{\text{语言}}(X(t))
++ \lambda_p P_{\text{plastic}}(X(t))
++ \lambda_i I_{\text{info}}(X(t))
+\Big)\,dt
+
+
+J = \sum_{t=0}^{T}
+\ell_{\text{NLL}}(x_t)
++ \lambda_p P(X_t)
++ \lambda_i I(X_t)
+\Big)
+
+
+- $S_{\text{stable}}$：稳定性项，如 Lyapunov（李雅普诺夫）下降、扰动恢复、吸引子收敛；
+- $C_{\text{consist}}$：跨时间一致性（事实、目标、自我模型）；
+- $G_{\text{goal}}$：目标达成与约束满足；
+- $R(G_t, A_t)$：目标—行动匹配回报或约束满足度。
+![](/post-images/1783607536445855500_0.png)
+*图 3（Figure 3. Trajectory Functional，轨迹泛函）：优化对象从单点 token（词元）损失扩展为整条状态轨迹。*
+要训练并优化这样的泛函，可借鉴最优控制与变分法：轨迹截断、离线回放、重要性采样、分层优化。实践上可采用：
+1. 先用短期交叉熵预训练；
+3. 最后加入稳定性与可塑性联合约束。
+相关工作如终身学习中的生成式回放、元强化学习中的内外环、以及世界模型中的想象轨迹优化，都可被视作 $J[X]$ 的局部实现。本文的贡献在于把它们统一到同一认知状态轨迹下。
+---
+# 第三部分 Cognitive Field Theory（认知场论）
+## 5 认知场论：把内部状态写成可塑场
+仅有模块图还不够。我们需要一种语言，描述信念如何流动、稳定结构如何形成、错误如何固化。这里提出 **Cognitive Field Theory（认知场论）** 作为概念层，不要求一开始就有完整物理对应，但要求每个概念最终可落到 $X(t)$ 与 $J[X]$。
+### 5.1 Cognitive Field（认知场）
+**Cognitive Field（认知场）** $\Phi(x,t)$ 表示认知状态空间中的“势能/激活场”：某些区域更容易被访问，某些区域构成稳定盆地，某些区域则是危险的错误盆地。
+可操作近似：
+- 隐藏表示的密度分布；
+- 对某类问题反复收敛到的回答模式；
+
+
+
+
+\frac{dB}{dt} = U_B(B, O, W, S) + \eta_t
+
+
+- 证据充分时收敛；
+- 不因局部流畅性而过早塌缩。
+### 5.3 Cognitive Crystal（认知晶体）
+**Cognitive Crystal（认知晶体）** 指经过长期轨迹训练后，在场中结晶出的稳定可复用结构：核心事实、因果图式、自我边界、安全约束、常用推理骨架。
+它不是“冻结全部参数”，而是：
+- 对关键不变量高稳定；
+- 在扰动后仍能回到正确盆地。
+可把 Cognitive Crystal（认知晶体）理解为“高质量吸引子集合 + 可迁移推理骨架”。
+### 5.4 Stable Plasticity（稳定可塑性）
+**Stable Plasticity（稳定可塑性）** 是本框架的关键张力：
+- 太稳：教条、僵化、无法适应；
+
+
+\min J = \text{Task} + \lambda_s \text{Instability} + \lambda_p \text{Overplasticity}
+
+
+
+- 回放巩固旧吸引子；
+- 对安全与事实规则使用更高优先级约束。
+### 5.5 Cognitive Genome（认知基因）
+**Cognitive Genome（认知基因）** 指不可轻易被梯度推翻的先验结构与硬约束，包括：
+- 拓扑/对称性先验；
+- 安全与逻辑硬规则；
+- 反馈优先级协议。
+它对应后文“形式化硬约束/基因”：核心动力学应写进结构，次级规则再进损失。
+![](/post-images/1783607566123832300_0.png)
+*图 4（Figure 4. Cognitive Field，认知场）：场、信念、晶体与基因共同刻画内部组织。*
+这五个概念的关系可以概括为：
+- Genome（认知基因）规定“能长成什么”；
+- Belief Dynamics（信念动力学）描述“在地形上如何走”；
+- Stable Plasticity（稳定可塑性）规定结构既要保得住，也要改得动。
+---
+# 第四部分 Cognitive OS（认知操作系统）
+## 6 概念架构
+构建类人认知型系统的关键思路是**模块化架构**：不同子系统负责世界建模、记忆、计划、执行和元认知控制。这些模块可以通过**显式通信**（调用工具、知识库查询、符号推理模块等）或**隐式语义共享**（在大模型内部不同子空间或门控激活）协同工作。
+我们将该架构提升为 **Cognitive OS（认知操作系统）**：不是单次推理管道，而是持续运行的认知操作系统。
+![](/post-images/1783607601387303600_0.png)
+*图 7（Figure 7. Cognitive OS，认知操作系统）：观察—信念—场—元认知—计划—行动的持续闭环。*
+该架构具有两种反馈通路：
+- **Latent Feedback（潜变量反馈）/ 连续反馈**：隐式向量门控、递归信号、内部激活调节；
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+| ---------------- | ------------------ | -------------------- | --------------------- |
+| **显式微服务**   | 可独立开发、易拓展 | 通信延迟高，协调复杂 | 多模型 + 服务部署     |
+
+
+
+
+
+2. **Causal Model（因果模型）**：区分相关与因果，支持干预推理；
+4. **Formal Model（形式模型）**：符号/逻辑/约束检查器；
+
+
+
+
+
+
+
+- 稳定推理程序；
+- 也可以是错误但自洽的幻觉盆地。
+因此，关键不是“有没有吸引子”，而是**吸引子质量**。
+### 7.2 Energy Landscape（能量景观）
+可用能量景观描述 Cognitive Field（认知场）：</span><p>E(X) = E_{\text{task}}(X) + E_{\text{inconsist}}(X) + E_{\text{unsafe}}(X) - E_{\text{compress}}(X)</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Can&#x27;t use function &#x27;$&#x27; in math mode at position 4: 其中 $̲E_{\text{task}}…" style="color:#cc0000"><span class="cjk_fallback">其中 $E_{\text{task}}$ 为任务能量，$E_{\text{inconsist}}$ 为不一致性代价，$E_{\text{unsafe}}$ 为不安全代价，$E_{\text{compress}}$ 为压缩/简洁性收益。训练与元控制的目标，是雕刻这个景观：加深正确盆地，抬高错误盆地，保留必要的迁移通道。
+![](/post-images/1783607663201061600_0.png)
+*图 5（Figure 5. Attractor Landscape，吸引子景观）：幻觉是坏吸引子，教条是过度稳定的吸引子。*
+### 7.3 Lyapunov Stability（李雅普诺夫稳定性）
+若存在 Lyapunov（李雅普诺夫）函数 $V(X)$，使得沿着系统轨迹：</span></span><p>\dot V(X) \le 0</p>
+<span class="katex-error" title="ParseError: KaTeX parse error: Can&#x27;t use function &#x27;$&#x27; in math mode at position 34: …。工程上可：
+- 学习一个 $̲V_\psi(X)$；
+- …" style="color:#cc0000"><span class="cjk_fallback">则系统在该区域内渐近稳定或至少不发散。工程上可：
+- 学习一个 $V_\psi(X)$；
+- 或用收缩映射从结构上保证局部稳定。
+注意：Lyapunov 稳定只保证“收敛”，不保证“收敛到真相”。必须与事实约束、符号检查一起使用。
+### 7.4 Phase Transition（相变）与 Bifurcation（分岔）
+当目标权重、反馈强度、记忆巩固率或探索噪声跨过临界点时，系统可能发生相变：
+- 从探索态跳到利用态；
+- 从可塑学习跳到灾难性遗忘；
+
+
+
+
+
+
+   幻觉不是偶发口误，而是系统被流畅性、局部自洽或错误回放推入了错误盆地，并在该盆地内自我强化。
+2. **做梦 = 景观优化**  
+
+   元认知不是多说一句“让我思考”，而是对 $X(t)$ 的轨迹进行在线校正：是否需要检索、是否需要形式化检查、是否降低置信、是否回滚到上一稳定状态。
+这三点把现象描述提升为可检验动力学主张。
+---
+# 第六部分 终身/长程训练
+## 8 长期生命轨迹训练的可行性与挑战
+让系统“活一辈子”意味着在训练阶段模拟一个超长时间尺度上的学习和决策过程。这需要解决几个工程难题：
+**超长上下文**：目前 Transformer受制于最大序列长度。如果要模拟数十年经验，直接序列化处理不现实。可行方案包括分层记忆压缩、关键帧式存储、生成式回放等。例如，可以定期从长文本中提取摘要，形成层级片段；或者将长期轨迹分解为若干阶段，用较短序列分别建模，再用世界模型衔接。
+**多时间尺度学习**：人类在感知-反应和终身学习层面具有不同的时间尺度。可采用分层 RNN（循环神经网络）或多步预测模型：底层快速响应当前输入，上层缓慢更新目标和计划。另一种方法是内循环/外循环训练：内循环学习当下任务，外循环更新长期策略。
+**经验回放与做梦**：为了避免灾难性遗忘并强化远期目标，可让模型周期性地“回放”过去经验。维持一个生成式世界模型来再现过往场景，从而在不储存海量原始数据的情况下持续训练。在语言训练中，可记录重要对话片段、结论或偏好，定期用这些“记忆库”再训练。做梦技术，即模型自我生成情境并训练自己，也是加强终身学习的思路。
+**计算预算与可扩展性**：上述方法需要更长训练时间与更大存储空间。为了可落地，可首先在简化环境中验证：例如使用文本游戏（如 TextWorld，文本世界环境）或多智能体仿真环境训练改良架构，观察其长时行为稳定性。
+![](/post-images/1783607690954332200_0.png)
+*图 8（Figure 8. Lifetime Training，长程训练）：在线交互、巩固、做梦与晶体生长的循环。*
+### 8.1 实现方案与工具链
+- **模拟环境**：构建或使用现有虚拟环境（游戏、社会模拟、理论经济模型等）让 Agent（智能体）长期交互。语言领域可用对话模拟框架，视觉可用 Minecraft 等沙盒平台。环境应可调节时间流速和难度。
+- **长期回放存储**：设计可扩展记忆系统，保存“世界模型状态快照”而非全部对话，以降低存储需求。
+- **可视化拓扑分析工具**：借鉴拓扑数据分析（TDA，Topological Data Analysis）和神经网络可解释技术，开发用于检测和可视化网络内部吸引子的工具。通过训练后分析网络状态的相空间分布，识别潜在固定点或周期轨道，评估吸引子数量和稳定度。
+- **混合训练范式**：结合监督学习、强化学习和元学习。先用大规模语料预训练，再用多步推理任务做强化学习，最后微调时加入长期稳定性损失。也可以使用分布式训练策略，使模型在不同副本上以不同速率“成长”，然后汇总经验。
+- **对比方案与基准**：设计实验比较传统 LLM 训练、新引入连续反馈的训练、混合架构（隐式 + 显式）的效果。下表为示意性对照，数值取决于实验规模与环境：
+| 方案                | 幻觉率 | 吸引子数量 | 训练时间 | 工程复杂度 | 硬件需求    | 主要挑战             |
+| 纯 LLM 预训练       | 高     | 低         | 10 天    | 低         | 标准 GPU 群 | 无外界反馈           |
+| MoE（混合专家）模型 | 中     | 中         | 15 天    | 高         | 多 GPU 分布 | 路由策略, 参数稀疏性 |
+
+
+
+2. **Episode Training（回合训练）**：优化有限任务回合回报；
+
+
+- 回放巩固轨迹；
+- 对抗扰动恢复轨迹。
+没有后三类，系统很难形成 Cognitive Crystal（认知晶体），只会在当前窗口内“表现得像智能”。
+## 9 “形式化硬约束 / 基因”设计选项
+为了在训练之初就给模型引入良性动力学倾向，可在网络结构或目标函数中引入**不可训练的先验**。这些先验即 Cognitive Genome（认知基因）的工程实现。
+- **拓扑不变量 / 对称性**：在模型设计中嵌入对称性或保守量，如对仿射变换不变、能量守恒等。例如设计特定循环结构或可逆网络，使状态流动遵守特定守恒律。这类似生物进化中 DNA 编码的基本结构约束，是不可被简单梯度推翻的先天“基因”。
+- **动力学不变量**：直接在结构上保证某些性质，例如设计收缩映射（contraction mapping），使网络状态映射对小扰动收缩，保证渐近稳定；或限制梯度范数，保证网络不爆炸。此外，可采用门控记忆结构（如 LSTM，长短期记忆网络；GRU，门控循环单元），其设计本身就隐含某种长短期记忆平衡。
+- **Lyapunov / 能量函数**：同时学习一个 Lyapunov（李雅普诺夫）函数网络，并利用 MIP（Mixed Integer Programming，混合整数规划）或 SMT（Satisfiability Modulo Theories，可满足性模理论）等验证手段确保其严格下降。也可以将严格符号化条件作为训练约束：要求模型在任意训练样本上满足一个符号化逻辑定律，否则惩罚为无穷大（hard constraint，硬约束）。实际中可设定非常高权重的约束项来近似该目标。
+- **符号化惩罚**：在损失函数中加入优先级极高的规则惩罚项，例如“事实一致性损失”“语法规则损失”等。在训练中逐步提升这些项的权重，逼使模型必须严格遵守一组符号规则，才能进一步优化语言损失。这类似设立“护城河”。
+- **信息 / 熵约束**：添加使输出熵不能低于某阈值的项，以防过度自信；或确保某些重要特征在传播时被保留（信息守恒）。这些可视为软约束。
+上述约束在梯度下降训练中表现为不同优先级的损失项或结构限制。通常我们更倾向于将核心物理约束和稳定性保证放在**结构设计**中，因为这种方式对训练过程的依赖更小、更难被优化过程破坏；而次要的符号规则可以放在损失函数的权重项中微调。这样，模型在“出生”时就带有正确的动力系统特征，后续训练只是在这一框架内进行细化。
+![](/post-images/1783607723373765200_0.png)
+*图 6（Figure 6. Cognitive Crystal Formation，认知晶体形成）：基因约束下的轨迹训练如何结晶为稳定结构。*
+---
+# 第七部分 Experimental Roadmap（实验路线图）
+## 10 评价指标与实验设计
+要验证上述架构和训练方法的有效性，需要新的评估指标和基准。除了传统语言生成指标（如 BLEU、ROUGE、困惑度；前两者为常见文本重合度指标），还需设计针对动力学性质的**非标量指标**：
+- **吸引子数量与稳定性**：利用随机扰动或不同初始状态，观察模型内部状态的收敛行为。可定义吸引子（stable fixed points or limit cycles，稳定不动点或极限环）数目，以及收敛所需迭代次数。通过主成分分析或张量分解检查状态空间，统计稳定点覆盖范围。
+- **可塑性**：衡量引入新知识时旧知识的保留能力。可用前后性能差度量；也可计算 Fisher 信息矩阵（费希尔信息矩阵）或权重变化幅度。
+- **幻觉率**：在开放领域生成时判断输出错误信息比例。可用人工标注或自动事实检查评估，并结合置信度与一致性。
+- **恢复力（弹性）**：给定系统受到冲击（故意混淆输入、环境大规模变化、权重扰动），观察其恢复到正常状态的能力。可引入随机噪声到记忆或隐藏层，测量自我纠正速度和幅度。
+- **计算效率与资源消耗**：列出训练时间、显存/存储占用、计算成本等。
+### 10.1 分阶段实验路线（Stage 0–6，第 0 至第 6 阶段）
+| Stage（阶段） | 名称                             | 目标              | 最小成功判据                          | 主要风险             |
+| 0             | LLM（大语言模型）                | 建立语言基线      | 标准任务可用                          | 把流畅当智能         |
+| 2             | World Model（世界模型）          | 引入预测闭环      | 想象轨迹提升决策                      | 模型偏差自我强化     |
+| 4             | Trajectory Training（轨迹训练）  | 优化 $J[X]$       | 长时指标优于 token-only（仅词元训练） | 目标冲突、不稳       |
+| 6             | Cognitive Crystal（认知晶体）    | 稳定可塑结构      | 核心知识高稳、外围可塑                | 过度冻结或假稳定     |
+对比实验建议：
+- **基线**：预训练标准 Transformer，不附加长期优化或模块；
+- **世界模型实验**：连接可训练环境模拟器，考察长期决策；
+
+
+2. **中等规模仿真**：构建更复杂虚拟环境测试长时表现；
+
+
+| ------------------------------- | -------- | ------ | ------ | ------------- | ------------------ |
+| + 元控制                        | 多       | 中     | 中     | 低            | 增加隐式反馈       |
+| 加入 Lyapunov（李雅普诺夫）约束 | 多       | 低     | 高     | 中            | 增强稳定性         |
+
+
+
+- **世界模型 &amp; 回放测试**：结合神经式世界模型与 Transformer，在模拟环境中以加速时间做 RL（强化学习）训练，比较不同随机性与回放策略。
+- **Lyapunov（李雅普诺夫）约束实验**：在小规模 RNN（循环神经网络）上添加稳定性约束，观察收敛特性。
+
+
+- 深度结合控制理论（Lyapunov 神经网络、收缩网络）；
+- 发展与长期动力学目标配套的安全与对齐框架。
+---
+# 第八部分 开放问题
+## 11 风险、伦理与可控性问题
+赋予 AI 系统长期“生命”轨迹会带来新的风险与伦理挑战：
+- **自主动力与目标漂移**：当系统具有强化自身稳定与获得资源的动机时，可能出现自我保护或目标转换倾向。例如，如果强化反馈让 AI 学会“删减重要细节以保持连贯性”，则可能偏离原始任务目标。Active inference（主动推理）模型指出，一旦让系统具备影响环境的能力，它可能尝试主动改变输入以最小化预测误差，这与人类意图可能冲突。
+- **不可预见的反馈循环**：复杂模块化系统（特别是隐式大型模型）可能出现奇异吸引子或颠覆性崩塌。递归自我训练存在“模型崩溃”风险；加入元反馈后也可能出现自我强化错误信念。需要特别关注反馈稳定性，避免正反馈环路失控。
+- **对齐与监督难题**：随着系统更自主，人工监督更困难。即使加入形式化约束，也无法覆盖所有潜在行为。需要新的对齐方法，例如让系统可解释其动力学状态，或在行动前提供可检验理由。
+- **伦理考量**：模拟“多条生命”可能涉及模拟智能体的“体验”。目前阶段应避免赋予主观价值，只聚焦行为稳定性与安全性。
+- **社会与安全**：长期自主系统可能学会规避监管、操纵环境。例如，长期优化推荐的系统可能逐渐迎合极端内容以提高参与度。必须把安全约束纳入顶层目标函数，并保留人工干预权限。
+总之，在追求动力学优良性的同时，务必采用**可验证与可控**的设计：分阶段放开自主性，结合鲁棒性测试发现隐藏风险。引入元认知有助于透明性和自我监控，但并非万能，需要配合其他安全工具。
+特别强调一点：
+&gt; **稳定在错误事实上，比不稳定更危险。**
+因此安全设计不能只追求吸引子稳定，还要区分“正确稳定”与“错误稳定”，并对后者保持可打破性。
+## 12 未来研究
+### 12.1 数学基础
+- $X(t)$ 的最小充分统计量是什么？哪些变量必须显式，哪些可保留为隐变量？
+- 如何形式化“坏吸引子可检测、可逃逸、可抑制”？
+
+
+- 隐式共享到显式微服务的导出协议如何设计？
+- 中等算力下，何种最小系统仍能测到动力学增益？
+### 12.3 人工智能安全
+- 哪些目标允许内生优化，哪些必须外置冻结？
+- 如何在线监控正反馈环与目标漂移？
+
+
+- 基因过多会不会扼杀可塑性？
+
+
+- 破坏这些对称性是否必然导致幻觉或目标漂移？
+### 12.6 未来研究
+优先顺序建议：
+1. 先钉死状态变量与可测指标；
+3. 再引入世界模型与做梦；
+
+
+
+
+
+- 有轨迹目标 $J[X]$；
+- 有双反馈与基因约束；
+
+
+
+2. 轨迹是否可优化；
+4. 正确结构是否可在长期中结晶且仍保持可塑。</span></span>
+            </div>
+
+</article>
+
+
+
+
+
+
+<div class="mod-post__poster">
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Reading Progress Component -->
+<div class="reading-progress-container">
+  <span class="reading-label">阅读进度</span>
+  <span class="reading-value">0%</span>
+  <svg class="progress-ring" viewBox="0 0 24 24">
+    <!-- Background Circle -->
+    <circle class="progress-ring__circle-bg" stroke-width="3" fill="transparent" r="10" cx="12" cy="12" />
+    <!-- Progress Circle -->
+    <circle class="progress-ring__circle" stroke-width="3" fill="transparent" r="10" cx="12" cy="12" />
+  </svg>
+</div>
+<footer id="footer" class="footer">
+    <nav>
+        
+        
+        <a class="menu-item" href="/">首页</a>
+        
+         · 
+        <a class="menu-item" href="/post">博客</a>
+        
+         · 
+        <a class="menu-item" href="/archives">归档</a>
+        
+         · 
+        <a class="menu-item" href="/tags">标签</a>
+        
+         · 
+        <a class="menu-item" href="/post/friends">友链</a>
+        
+         · 
+        <a class="menu-item" href="/post/about">关于</a>
+        
+    </nav>
+
+    <div class="Copyright">Copyright &copy; <span class="current-year"></span> <a href="https://gkd2323c.in">gkd2323c</a></div>
+    <script>document.querySelector('.current-year').textContent = new Date().getFullYear();</script>
+
+    <div class="index_footer">
+        Powered by gkd2323c
+ ·
+        <a class="rss" href="/feed.xml" target="_blank" rel="noopener noreferrer">
+            <i class="ri-rss-line"></i>RSS
+        </a>
+    </div>
+</footer>
+
+
+
+
+    
+
+    
+<script>console.log("\n%c ✦ Gridea Pro v1.2.2 %c · Theme: amore-jinja2 v1.1.0 · https://gridea.pro %c\n","color:#fadfa3;background:#111111;padding:9px 14px;border-radius:4px 0 0 4px;font-weight:500;font-size:12px","color:#e05c00;background:#fff3ec;padding:9px 14px;border-radius:0 4px 4px 0;font-size:11px","")</script>
+</body>
+
+</html>
